@@ -22,13 +22,7 @@ public class Sensor {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "device_id")
-    @Nullable
-    private Device device;
-
-    public Sensor(String name, @Nullable Device device) {
+    public Sensor(String name) {
         this.name = name;
-        this.device = device;
     }
 }

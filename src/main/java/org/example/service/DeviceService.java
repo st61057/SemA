@@ -26,9 +26,6 @@ public class DeviceService {
     private DeviceRepository deviceRepository;
 
     @Autowired
-    private SensorService sensorService;
-
-    @Autowired
     private SensorRepository sensorRepository;
 
     @Autowired
@@ -37,19 +34,16 @@ public class DeviceService {
     public Pair<Optional<Device>, String> createDevice(DeviceDto deviceDto) {
         if (!findDeviceByName(deviceDto.getName()).isPresent()) {
 
-            List<Sensor> sensors = new ArrayList<>();
-            for (Integer sensorId : deviceDto.getSensorId()) {
-                Optional<Sensor> sensor = sensorRepository.findById(sensorId);
-                if (sensor.isPresent()){
-                    sensors.add(sensor.get());
-                }
-            }
+            List<Sensor> sensors = Collections.EMPTY_LIST;
 
-            List<User> users = Collections.EMPTY_LIST;
-            deviceDto.getUsers().forEach(user -> users.add(user));
-            Device device = new Device(deviceDto.getName(),
-                    users,
-                    sensors);
+            for (Integer sensorId : deviceDto.getSensorsId()) {
+                Optional<Sensor> sensor = sensorRepository.findById(sensorId);
+                if (sensor.isEmpty()) {
+                    return Pair.of(Optional.empty(), "Sensor with this id " + sensorId + " doesn't exists!");
+                }
+                sensors.add(sensor.get());
+            }
+            Device device = new Device(deviceDto.getName(), sensors);
             return Pair.of(Optional.of(deviceRepository.save(device)), StringUtils.EMPTY);
         }
         return Pair.of(Optional.empty(), "Device with this name already exists!");
@@ -57,25 +51,24 @@ public class DeviceService {
 
     public Pair<Optional<Device>, String> updateDevice(UpdateDeviceDto updateDeviceDto) {
         Optional<Device> existingDevice = findDeviceById(updateDeviceDto.getId());
-        Optional<Sensor> existingSensor = sensorRepository.findById(updateDeviceDto.getSensorId());
-        Optional<User> existingUser = userRepository.findById(updateDeviceDto.getUserId());
-
-        if (existingSensor.isEmpty()) {
+        if (existingDevice.isEmpty()) {
             return Pair.of(Optional.empty(), "Sensor with this id doesn't exists");
         }
 
-        if (existingUser.isEmpty()) {
-            return Pair.of(Optional.empty(), "User with this id doesn't exists");
+        List<Sensor> sensors = new ArrayList<>();
+        for (Integer sensorId : updateDeviceDto.getSensorsId()) {
+            Optional<Sensor> existingSensor = sensorRepository.findById(sensorId);
+            if (existingSensor.isEmpty()) {
+                return Pair.of(Optional.empty(), "Sensor with id " + sensorId + " doesn't exists");
+            }
+            sensors.add(existingSensor.get());
         }
 
-        if (existingDevice.isPresent()) {
-            Device updatedDevice = existingDevice.get();
-            updatedDevice.setName(updateDeviceDto.getName());
-//            updatedDevice.setSensorList(existingSensor.get());
-            return Pair.of(Optional.of(deviceRepository.save(updatedDevice)), StringUtils.EMPTY);
-        }
+        Device updatedDevice = existingDevice.get();
+        updatedDevice.setName(updateDeviceDto.getName());
+        updatedDevice.setSensorList(sensors);
+        return Pair.of(Optional.of(deviceRepository.save(updatedDevice)), StringUtils.EMPTY);
 
-        return Pair.of(Optional.empty(), "Sensor with this id doesn't exists");
     }
 
     public Pair<Optional<Device>, String> deleteDevice(Integer id) {
@@ -83,8 +76,6 @@ public class DeviceService {
         if (existingDevice.isEmpty()) {
             return Pair.of(Optional.empty(), "Device with this id doesn't exists");
         }
-        List<Sensor> sensors = sensorService.findSensorsByDeviceId(id);
-        sensors.forEach(sensor -> sensor.setDevice(null));
 
         List<User> users = userRepository.findUsersByDevices(existingDevice.get());
         users.forEach(user -> user.setDevices(

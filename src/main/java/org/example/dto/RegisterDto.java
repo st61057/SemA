@@ -1,22 +1,18 @@
 package org.example.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
-import java.util.List;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UpdateDeviceDto {
+public class RegisterDto {
 
-    private Integer id;
+    private String username;
 
-    private String name;
+    private String email;
 
-    @Nullable
-    private List<Integer> sensorsId;
+    private String password;
 }

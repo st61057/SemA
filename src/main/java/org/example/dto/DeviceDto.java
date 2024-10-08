@@ -1,21 +1,20 @@
 package org.example.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.example.entity.User;
+import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class DeviceDto {
 
     private String name;
 
     @Nullable
-    private List<User> users;
-
-    @Nullable
-    private List<Integer> sensorId = new ArrayList<>();
+    private List<Integer> sensorsId;
 
 }

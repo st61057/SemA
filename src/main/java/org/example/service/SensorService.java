@@ -30,8 +30,7 @@ public class SensorService {
     public Pair<Optional<Sensor>, String> createSensor(SensorDto sensorDto) {
 
         if (!findSensorByName(sensorDto.getName()).isPresent()) {
-            Optional<Device> device = deviceService.findDeviceById(sensorDto.getDeviceId());
-            Sensor sensor = new Sensor(sensorDto.getName(), device.isPresent() ? device.get() : null);
+            Sensor sensor = new Sensor(sensorDto.getName());
             return Pair.of(Optional.of(sensorRepository.save(sensor)), StringUtils.EMPTY);
         }
         return Pair.of(Optional.empty(), "Sensor with this name already exists!");
@@ -47,7 +46,6 @@ public class SensorService {
         if (existingSensor.isPresent()) {
             Sensor updatedSensor = existingSensor.get();
             updatedSensor.setName(updateSensorDto.getName());
-            updatedSensor.setDevice(existingDevice.get());
             return Pair.of(Optional.of(sensorRepository.save(updatedSensor)), StringUtils.EMPTY);
         }
 
@@ -65,10 +63,6 @@ public class SensorService {
 
         sensorRepository.delete(existingSensor.get());
         return Pair.of(Optional.of(existingSensor.get()), StringUtils.EMPTY);
-    }
-
-    public List<Sensor> findSensorsByDeviceId(Integer id){
-        return sensorRepository.findSensorsByDeviceId(id);
     }
 
     public Optional<Sensor> findSensorByName(String name) {

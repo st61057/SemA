@@ -1,6 +1,7 @@
 package org.example.service;
 
 
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.dao.UserRepository;
 import org.example.dto.*;
@@ -11,14 +12,16 @@ import org.springframework.data.util.Pair;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
+
+@AllArgsConstructor
 @Service
 public class UserService implements UserDetailsService {
 
@@ -28,9 +31,11 @@ public class UserService implements UserDetailsService {
     @Autowired
     private DeviceService deviceService;
 
-    public Pair<Optional<User>, String> createUser(UserDto userDto) {
-        if (!findUserByUsername(userDto.getUsername()).isPresent()) {
-            User user = new User(userDto.getUsername(), userDto.getEmail(), userDto.getPassword());
+    private final PasswordEncoder passwordEncoder;
+
+    public Pair<Optional<User>, String> createUser(RegisterDto registerDto) {
+        if (!findUserByUsername(registerDto.getUsername()).isPresent()) {
+            User user = new User(registerDto.getUsername(), registerDto.getEmail(), passwordEncoder.encode(registerDto.getPassword()));
             user.setResetCode(UUID.randomUUID().toString());
             return Pair.of(Optional.of(userRepository.save(user)), StringUtils.EMPTY);
         }
@@ -71,12 +76,6 @@ public class UserService implements UserDetailsService {
         }
 
         User user = existingUser.get();
-
-        List<Device> devices = user.getDevices();
-        devices.forEach(device -> device.setUsers(
-                device.getUsers().stream()
-                        .filter(u -> !u.getId().equals(user.getId()))
-                        .collect(Collectors.toList())));
 
         userRepository.delete(user);
         return Pair.of(Optional.of(user), StringUtils.EMPTY);
@@ -127,6 +126,10 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("Invalid username or password.");
         }
         return login.get();
+    }
+
+    public boolean authenticated(User user, LoginDto loginDto) {
+        return passwordEncoder.matches(loginDto.getPassword(), user.getPassword());
     }
 
 }

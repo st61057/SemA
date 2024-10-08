@@ -23,19 +23,13 @@ public class Device {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
-//    @JoinColumn(name = "id", referencedColumnName = "id")
-    @Nullable
-    private List<User> users;
-
     @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)//(mappedBy = "device")
 //    @JoinColumn(name = "id", referencedColumnName = "id")
     @Nullable
     private List<Sensor> sensorList;
 
-    public Device(String name, @Nullable List<User> users, @Nullable List<Sensor> sensorList) {
+    public Device(String name, @Nullable List<Sensor> sensorList) {
         this.name = name;
-        this.users = users;
         this.sensorList = sensorList;
     }
 

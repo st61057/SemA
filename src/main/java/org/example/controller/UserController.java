@@ -13,6 +13,7 @@ import org.simplejavamail.email.EmailBuilder;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 //@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/v3")
+@RequestMapping(path = "/api")
 public class UserController {
 
     private final UserService userService;
@@ -33,18 +34,9 @@ public class UserController {
         this.modelMapper = modelMapper;
     }
 
-    @PostMapping(value = "/api/register")
-    public ResponseEntity<?> addUser(@RequestBody UserDto userDto) {
-        Pair<Optional<User>, String> creation = userService.createUser(userDto);
-        Optional<User> user = creation.getFirst();
-        if (user.isPresent()) {
-            return ResponseEntity.ok(convertUserToDto(user.get()));
-        }
 
-        return ResponseEntity.badRequest().body(creation.getSecond());
-    }
 
-    @PutMapping(value = "/api/change-user-details")
+    @PutMapping(value = "/update-user")
     public ResponseEntity<?> updateUser(@RequestBody UpdateUserDto userDto) {
         Pair<Optional<User>, String> update = userService.updateUser(userDto);
         Optional<User> device = update.getFirst();
@@ -54,7 +46,7 @@ public class UserController {
         return ResponseEntity.badRequest().body(update.getSecond());
     }
 
-    @DeleteMapping(value = "/api/delete-user/{id}")
+    @DeleteMapping(value = "/delete-user/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
         Pair<Optional<User>, String> delete = userService.deleteUser(id);
         Optional<User> sensor = delete.getFirst();
@@ -65,7 +57,7 @@ public class UserController {
     }
 
 
-    @PostMapping(value = "/api/reset-request/{id")
+    @PostMapping(value = "/reset-request/{username}")
     public ResponseEntity<?> sendResetCode(@RequestBody String username) {
         Optional<User> existingUser = userService.findUserByUsername(username);
         if (existingUser.isPresent()) {
@@ -78,7 +70,7 @@ public class UserController {
         return ResponseEntity.badRequest().body("User doesn't exist");
     }
 
-    @PutMapping(value = "/api/change-password")
+    @PutMapping(value = "/change-password")
     public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
         Pair<Optional<User>, String> update = userService.updatePassword(changePasswordDto);
         Optional<User> updateUser = update.getFirst();
@@ -86,7 +78,11 @@ public class UserController {
             return ResponseEntity.ok(convertUserToDto(updateUser.get()));
         }
         return ResponseEntity.badRequest().body(update.getSecond());
+    }
 
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public ResponseEntity<?> logout() throws AuthenticationException {
+        return ResponseEntity.ok("Successfully log out");
     }
 
     private UserDto convertUserToDto(User user) {
@@ -107,7 +103,7 @@ public class UserController {
 
 
         Mailer mailer = MailerBuilder
-                .withSMTPServer("smtp.gmail.com", 587, "your-email@gmail.com", "your-password")
+                .withSMTPServer("smtp.gmail.com", 587, "test@gmail.com", "your-password")
                 .withTransportStrategy(TransportStrategy.SMTP_TLS)
                 .buildMailer();
 

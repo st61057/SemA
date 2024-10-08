@@ -1,25 +1,27 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.example.dto.DeviceDto;
 import org.example.dto.UpdateDeviceDto;
 import org.example.entity.Device;
 import org.example.entity.Sensor;
-import org.example.entity.User;
 import org.example.service.DeviceService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 //@CrossOrigin(origins = "*", maxAge = 3600)
+@Tag(name = "Device", description = "Devices")
+@Controller
 @RestController
-@RequestMapping("/v3")
+@RequestMapping(path = "/api")
 public class DeviceController {
 
     private final DeviceService deviceService;
@@ -31,7 +33,7 @@ public class DeviceController {
         this.modelMapper = modelMapper;
     }
 
-    @GetMapping("/api/all-devices")
+    @GetMapping("/all-devices")
     @Operation(
             summary = "All devices",
             description = "Getting all devices")
@@ -40,12 +42,7 @@ public class DeviceController {
         return ResponseEntity.ok(sensors.stream().map(this::convertDeviceToDto).collect(Collectors.toList()));
     }
 
-    @GetMapping("/api/test/{id}")
-    public String testPost(@PathVariable @NotNull Integer id) {
-        return "Hello World!" + id;
-    }
-
-    @PostMapping(value = "/api/device-add")
+    @PostMapping(value = "/device-add")
     @Operation(
             summary = "Add device",
             description = "Adding device")
@@ -58,7 +55,7 @@ public class DeviceController {
         return ResponseEntity.badRequest().body(creation.getSecond());
     }
 
-    @PutMapping(value = "/api/device-update")
+    @PutMapping(value = "/device-update")
     public ResponseEntity<?> updateDevice(@RequestBody UpdateDeviceDto deviceDto) {
         Pair<Optional<Device>, String> update = deviceService.updateDevice(deviceDto);
         Optional<Device> device = update.getFirst();
@@ -68,7 +65,7 @@ public class DeviceController {
         return ResponseEntity.badRequest().body(update.getSecond());
     }
 
-    @DeleteMapping(value = "/api/device-update/{id}")
+    @DeleteMapping(value = "/device-update/{id}")
     public ResponseEntity<?> deleteDevice(@PathVariable Integer id) {
         Pair<Optional<Device>, String> delete = deviceService.deleteDevice(id);
         Optional<Device> sensor = delete.getFirst();
@@ -81,14 +78,11 @@ public class DeviceController {
     private DeviceDto convertDeviceToDto(Device device) {
         DeviceDto deviceDto = modelMapper.map(device, DeviceDto.class);
         deviceDto.setName(device.getName());
-        List<User> users = device.getUsers();
-//        Optional<Sensor> sensor = Optional.of(device.getSensor());
+
         List<Sensor> sensors = device.getSensorList();
-        deviceDto.setUsers(users);
         if (sensors != null) {
-            sensors.forEach(sensor-> deviceDto.getSensorId().add(sensor.getId()));
+//            sensors.forEach(sensor -> createDeviceDto.getSensorId().add(sensor.getId()));
         }
-//        deviceDto.setSensorId(sensor.map(Sensor::getId).orElse(null));
         return deviceDto;
     }
 }

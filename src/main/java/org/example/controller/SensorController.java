@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 //@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/v3")
+@RequestMapping(name = "/api")
 public class SensorController {
 
     private final SensorService sensorService;
@@ -28,13 +28,13 @@ public class SensorController {
         this.modelMapper = modelMapper;
     }
 
-    @GetMapping("/api/all-sensors")
+    @GetMapping("/all-sensors")
     public ResponseEntity<?> getAllSensors() {
         List<Sensor> sensors = sensorService.findAllSensors();
         return ResponseEntity.ok(sensors.stream().map(this::convertSensorToDto).collect(Collectors.toList()));
     }
 
-    @PostMapping(value = "/api/sensor-add")
+    @PostMapping(value = "/sensor-add")
     public ResponseEntity<?> addSensor(@RequestBody SensorDto sensorDto) {
         Pair<Optional<Sensor>, String> creation = sensorService.createSensor(sensorDto);
         Optional<Sensor> sensor = creation.getFirst();
@@ -44,7 +44,7 @@ public class SensorController {
         return ResponseEntity.badRequest().body(creation.getSecond());
     }
 
-    @PutMapping(value = "/api/sensor-update")
+    @PutMapping(value = "/sensor-update")
     public ResponseEntity<?> updateSensor(@RequestBody UpdateSensorDto sensorDto) {
         Pair<Optional<Sensor>, String> creation = sensorService.updateSensor(sensorDto);
         Optional<Sensor> sensor = creation.getFirst();
@@ -54,7 +54,7 @@ public class SensorController {
         return ResponseEntity.badRequest().body(creation.getSecond());
     }
 
-    @DeleteMapping(value = "/api/sensor-update/{id}")
+    @DeleteMapping(value = "/sensor-update/{id}")
     public ResponseEntity<?> deleteSensor(@PathVariable Integer id) {
         Pair<Optional<Sensor>, String> creation = sensorService.deleteSensor(id);
         Optional<Sensor> sensor = creation.getFirst();
@@ -67,8 +67,6 @@ public class SensorController {
     private SensorDto convertSensorToDto(Sensor sensor) {
         SensorDto sensorDto = modelMapper.map(sensor, SensorDto.class);
         sensorDto.setName(sensorDto.getName());
-        Optional<Device> device = Optional.of(sensor.getDevice());
-        sensorDto.setDeviceId(device.map(Device::getId).orElse(null));
         return sensorDto;
     }
 
