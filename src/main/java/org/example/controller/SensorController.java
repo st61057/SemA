@@ -2,7 +2,6 @@ package org.example.controller;
 
 import org.example.dto.SensorDto;
 import org.example.dto.UpdateSensorDto;
-import org.example.entity.Device;
 import org.example.entity.Sensor;
 import org.example.service.SensorService;
 import org.modelmapper.ModelMapper;

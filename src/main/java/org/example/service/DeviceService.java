@@ -34,14 +34,16 @@ public class DeviceService {
     public Pair<Optional<Device>, String> createDevice(DeviceDto deviceDto) {
         if (!findDeviceByName(deviceDto.getName()).isPresent()) {
 
-            List<Sensor> sensors = Collections.EMPTY_LIST;
+            List<Sensor> sensors = new ArrayList<>();
 
-            for (Integer sensorId : deviceDto.getSensorsId()) {
-                Optional<Sensor> sensor = sensorRepository.findById(sensorId);
-                if (sensor.isEmpty()) {
-                    return Pair.of(Optional.empty(), "Sensor with this id " + sensorId + " doesn't exists!");
+            if (deviceDto.getSensorsId() != null) {
+                for (Integer sensorId : deviceDto.getSensorsId()) {
+                    Optional<Sensor> sensor = sensorRepository.findById(sensorId);
+                    if (sensor.isEmpty()) {
+                        return Pair.of(Optional.empty(), "Sensor with this id " + sensorId + " doesn't exists!");
+                    }
+                    sensors.add(sensor.get());
                 }
-                sensors.add(sensor.get());
             }
             Device device = new Device(deviceDto.getName(), sensors);
             return Pair.of(Optional.of(deviceRepository.save(device)), StringUtils.EMPTY);
@@ -56,12 +58,14 @@ public class DeviceService {
         }
 
         List<Sensor> sensors = new ArrayList<>();
-        for (Integer sensorId : updateDeviceDto.getSensorsId()) {
-            Optional<Sensor> existingSensor = sensorRepository.findById(sensorId);
-            if (existingSensor.isEmpty()) {
-                return Pair.of(Optional.empty(), "Sensor with id " + sensorId + " doesn't exists");
+        if (updateDeviceDto.getSensorsId() != null) {
+            for (Integer sensorId : updateDeviceDto.getSensorsId()) {
+                Optional<Sensor> existingSensor = sensorRepository.findById(sensorId);
+                if (existingSensor.isEmpty()) {
+                    return Pair.of(Optional.empty(), "Sensor with id " + sensorId + " doesn't exists");
+                }
+                sensors.add(existingSensor.get());
             }
-            sensors.add(existingSensor.get());
         }
 
         Device updatedDevice = existingDevice.get();

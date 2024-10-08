@@ -61,9 +61,10 @@ public class UserController {
     public ResponseEntity<?> sendResetCode(@RequestBody String username) {
         Optional<User> existingUser = userService.findUserByUsername(username);
         if (existingUser.isPresent()) {
-            existingUser.get().setResetCode(UUID.randomUUID().toString());
+            String resetCode = UUID.randomUUID().toString();
+            existingUser.get().setResetCode(resetCode);
             User updatedUser = userService.updateUser(existingUser.get());
-            sendEmail(updatedUser.getUsername(), updatedUser.getEmail(), updatedUser.getResetCode());
+            sendEmail(updatedUser.getUsername(), updatedUser.getEmail(), resetCode);
             return ResponseEntity.ok(convertUserToDto(updatedUser));
 
         }

@@ -57,12 +57,13 @@ public class SensorService {
         if (existingSensor.isEmpty()) {
             return Pair.of(Optional.empty(), "Sensor with this id doesn't exists");
         }
+        Sensor deletedSensor = existingSensor.get();
 
-        List<Device> devices = deviceService.findDevicesBySensorListContains(existingSensor.get());
+        List<Device> devices = deviceService.findDevicesBySensorListContains(deletedSensor);
         devices.forEach(device -> deviceService.deleteDevice(device));
 
-        sensorRepository.delete(existingSensor.get());
-        return Pair.of(Optional.of(existingSensor.get()), StringUtils.EMPTY);
+        sensorRepository.delete(deletedSensor);
+        return Pair.of(Optional.of(deletedSensor), StringUtils.EMPTY);
     }
 
     public Optional<Sensor> findSensorByName(String name) {

@@ -15,10 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 @AllArgsConstructor
@@ -44,7 +41,7 @@ public class UserService implements UserDetailsService {
 
     public Pair<Optional<User>, String> updateUser(UpdateUserDto updateUserDto) {
 
-        List<Device> listOfDevices = Collections.EMPTY_LIST;
+        List<Device> listOfDevices = new ArrayList<>();
         updateUserDto.getDevicesId().forEach(deviceId -> listOfDevices.add(deviceService.findDeviceById(deviceId).get()));
 
         if (listOfDevices.size() != updateUserDto.getDevicesId().size()) {
@@ -57,16 +54,13 @@ public class UserService implements UserDetailsService {
             return Pair.of(Optional.empty(), "User with this id doesn't exists");
         }
 
-        if (existingUser.isPresent()) {
-            User updatedUser = existingUser.get();
-            updatedUser.setUsername(updateUserDto.getUsername());
-            updatedUser.setEmail(updatedUser.getEmail());
-            updatedUser.setDevices(listOfDevices);
+        User updatedUser = existingUser.get();
+        updatedUser.setUsername(updateUserDto.getUsername());
+        updatedUser.setEmail(updatedUser.getEmail());
+        updatedUser.setDevices(listOfDevices);
 
-            return Pair.of(Optional.of(userRepository.save(updatedUser)), StringUtils.EMPTY);
-        }
+        return Pair.of(Optional.of(userRepository.save(updatedUser)), StringUtils.EMPTY);
 
-        return Pair.of(Optional.empty(), "Sensor with this id doesn't exists");
     }
 
     public Pair<Optional<User>, String> deleteUser(Integer id) {
