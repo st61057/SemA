@@ -88,8 +88,16 @@ public class DeviceService {
                         .filter(device -> !device.getId().equals(existingDevice.get().getId()))
                         .collect(Collectors.toList())));
 
-        deviceRepository.delete(existingDevice.get());
-        return Pair.of(Optional.of(existingDevice.get()), StringUtils.EMPTY);
+        Device device = existingDevice.get();
+        List<Sensor> sensors = new ArrayList<>();
+        for (Sensor sensor : existingDevice.get().getSensorList()){
+            sensor.setDevice(null);
+            sensors.add(sensor);
+        }
+        device.setSensorList(sensors);
+
+        deviceRepository.delete(device);
+        return Pair.of(Optional.of(device), StringUtils.EMPTY);
     }
 
 
