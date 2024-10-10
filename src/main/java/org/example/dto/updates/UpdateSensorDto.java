@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.dto.updates;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -12,11 +12,11 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class UpdateSensorDto {
 
-    @Schema(description = "Current sensor name", example = "my_sensor_1")
+    @Schema(description = "Current sensor name", example = "testsenzor_1")
     @NotBlank(message = "Name is required.")
     private String oldName;
 
-    @Schema(description = "Updated sensor name", example = "my_sensor_new_1")
+    @Schema(description = "Updated sensor name", example = "testsenzor_1.0")
     @NotBlank(message = "Name is required.")
     private String newName;
 

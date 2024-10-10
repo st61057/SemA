@@ -4,7 +4,10 @@ package org.example.service;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.dao.UserRepository;
-import org.example.dto.*;
+import org.example.dto.basic.LoginDto;
+import org.example.dto.updates.ChangePasswordDto;
+import org.example.dto.updates.RegisterDto;
+import org.example.dto.updates.UpdateUserDto;
 import org.example.entity.Device;
 import org.example.entity.Sensor;
 import org.example.entity.User;
@@ -79,6 +82,13 @@ public class UserService implements UserDetailsService {
         }
 
         User user = existingUser.get();
+
+        List<Device> devices = new ArrayList<>();
+        for (Device device : user.getDevices()){
+            device.setUser(null);
+            devices.add(device);
+        }
+        user.setDevices(devices);
 
         userRepository.delete(user);
         return Pair.of(Optional.of(user), StringUtils.EMPTY);

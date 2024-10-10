@@ -1,4 +1,4 @@
-package org.example.dto;
+package org.example.dto.basic;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;

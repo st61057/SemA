@@ -21,27 +21,13 @@ public class SecurityConfig {
 
 //    private final JwtTokenUtil jwtTokenUtil;
 
-    private static final String[] IGNORED_PATHS = new String[]{"/**", "/v3/**", "/swagger-ui/**", "/public/**"};
+    private static final String[] IGNORED_PATHS = new String[]{"/v3/**", "/swagger-ui/**", "/public/**"};
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().antMatchers(IGNORED_PATHS);
     }
 
-//    @Bean
-//    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder passwordEncoder) {
-//        UserDetails user = User.withUsername("user")
-//                .password(passwordEncoder.encode("password"))
-//                .roles("USER")
-//                .build();
-//
-//        UserDetails admin = User.withUsername("admin")
-//                .password(passwordEncoder.encode("admin"))
-//                .roles("USER", "ADMIN")
-//                .build();
-//
-//        return new InMemoryUserDetailsManager(user, admin);
-//    }
 //
 //    @Bean
 //    public JwtAuthenticationFilter authenticationTokenFilterBean() {
