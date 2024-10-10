@@ -4,8 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.example.dao.DeviceRepository;
 import org.example.dao.SensorRepository;
 import org.example.dao.UserRepository;
-import org.example.dto.DeviceDto;
-import org.example.dto.UpdateDeviceDto;
+import org.example.dto.basic.DeviceDto;
+import org.example.dto.updates.UpdateDeviceDto;
 import org.example.entity.Device;
 import org.example.entity.Sensor;
 import org.example.entity.User;
@@ -14,7 +14,6 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

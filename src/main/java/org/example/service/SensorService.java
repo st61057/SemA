@@ -3,8 +3,8 @@ package org.example.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.example.dao.SensorRepository;
-import org.example.dto.SensorDto;
-import org.example.dto.UpdateSensorDto;
+import org.example.dto.basic.SensorDto;
+import org.example.dto.updates.UpdateSensorDto;
 import org.example.entity.Device;
 import org.example.entity.Sensor;
 import org.springframework.beans.factory.annotation.Autowired;
