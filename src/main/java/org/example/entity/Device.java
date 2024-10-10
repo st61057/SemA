@@ -1,5 +1,6 @@
 package org.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,6 +8,7 @@ import lombok.Setter;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -23,12 +25,15 @@ public class Device {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)//(mappedBy = "device")
-//    @JoinColumn(name = "id", referencedColumnName = "id")
-    @Nullable
-    private List<Sensor> sensorList;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User user;
 
-    public Device(String name, @Nullable List<Sensor> sensorList) {
+    @OneToMany(mappedBy = "device", fetch = FetchType.EAGER)
+    private List<Sensor> sensorList = new ArrayList<>();
+
+    public Device(String name, List<Sensor> sensorList) {
         this.name = name;
         this.sensorList = sensorList;
     }

@@ -36,11 +36,11 @@ public class DeviceService {
 
             List<Sensor> sensors = new ArrayList<>();
 
-            if (deviceDto.getSensorsId() != null) {
-                for (Integer sensorId : deviceDto.getSensorsId()) {
-                    Optional<Sensor> sensor = sensorRepository.findById(sensorId);
+            if (deviceDto.getSensorsName() != null) {
+                for (String sensorName : deviceDto.getSensorsName()) {
+                    Optional<Sensor> sensor = sensorRepository.findByName(sensorName);
                     if (sensor.isEmpty()) {
-                        return Pair.of(Optional.empty(), "Sensor with this id " + sensorId + " doesn't exists!");
+                        return Pair.of(Optional.empty(), "Sensor with this name " + sensorName + " doesn't exists!");
                     }
                     sensors.add(sensor.get());
                 }
@@ -52,18 +52,20 @@ public class DeviceService {
     }
 
     public Pair<Optional<Device>, String> updateDevice(UpdateDeviceDto updateDeviceDto) {
-        Optional<Device> existingDevice = findDeviceById(updateDeviceDto.getId());
+        Optional<Device> existingDevice = findDeviceByName(updateDeviceDto.getName());
         if (existingDevice.isEmpty()) {
-            return Pair.of(Optional.empty(), "Sensor with this id doesn't exists");
+            return Pair.of(Optional.empty(), "Sensor with this name doesn't exists");
         }
 
         List<Sensor> sensors = new ArrayList<>();
-        if (updateDeviceDto.getSensorsId() != null) {
-            for (Integer sensorId : updateDeviceDto.getSensorsId()) {
-                Optional<Sensor> existingSensor = sensorRepository.findById(sensorId);
+        if (updateDeviceDto.getSensorsNames() != null) {
+            for (String sensorName : updateDeviceDto.getSensorsNames()) {
+                Optional<Sensor> existingSensor = sensorRepository.findByName(sensorName);
                 if (existingSensor.isEmpty()) {
-                    return Pair.of(Optional.empty(), "Sensor with id " + sensorId + " doesn't exists");
+                    return Pair.of(Optional.empty(), "Sensor with name " + sensorName + " doesn't exists");
                 }
+                Sensor sensor = existingSensor.get();
+                sensor.setDevice(existingDevice.get());
                 sensors.add(existingSensor.get());
             }
         }
@@ -75,10 +77,10 @@ public class DeviceService {
 
     }
 
-    public Pair<Optional<Device>, String> deleteDevice(Integer id) {
-        Optional<Device> existingDevice = findDeviceById(id);
+    public Pair<Optional<Device>, String> deleteDevice(String name) {
+        Optional<Device> existingDevice = findDeviceByName(name);
         if (existingDevice.isEmpty()) {
-            return Pair.of(Optional.empty(), "Device with this id doesn't exists");
+            return Pair.of(Optional.empty(), "Device with this name doesn't exists");
         }
 
         List<User> users = userRepository.findUsersByDevices(existingDevice.get());

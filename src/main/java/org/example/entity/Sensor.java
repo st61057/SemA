@@ -18,8 +18,12 @@ public class Sensor {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "device_id")
+    private Device device;
 
     public Sensor(String name) {
         this.name = name;

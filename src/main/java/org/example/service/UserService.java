@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.example.dao.UserRepository;
 import org.example.dto.*;
 import org.example.entity.Device;
+import org.example.entity.Sensor;
 import org.example.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -41,17 +42,25 @@ public class UserService implements UserDetailsService {
 
     public Pair<Optional<User>, String> updateUser(UpdateUserDto updateUserDto) {
 
-        List<Device> listOfDevices = new ArrayList<>();
-        updateUserDto.getDevicesId().forEach(deviceId -> listOfDevices.add(deviceService.findDeviceById(deviceId).get()));
-
-        if (listOfDevices.size() != updateUserDto.getDevicesId().size()) {
-            return Pair.of(Optional.empty(), "Some sensors with this id doesn't exists");
-        }
-
-        Optional<User> existingUser = findUserById(updateUserDto.getId());
+        Optional<User> existingUser = findUserByUsername(updateUserDto.getUsername());
 
         if (existingUser.isEmpty()) {
-            return Pair.of(Optional.empty(), "User with this id doesn't exists");
+            return Pair.of(Optional.empty(), "User with this name doesn't exists");
+        }
+
+        List<Device> listOfDevices = new ArrayList<>();
+
+        if (!updateUserDto.getDevicesNames().isEmpty()) {
+            for (String deviceId : updateUserDto.getDevicesNames()) {
+                Optional<Device> existingDevice = deviceService.findDeviceByName(deviceId);
+                if (existingDevice.isEmpty()) {
+                    return Pair.of(Optional.empty(), "Device with id" + deviceId + " doesn't exists");
+                }
+
+                Device device = existingDevice.get();
+                device.setUser(existingUser.get());
+                listOfDevices.add(existingDevice.get());
+            }
         }
 
         User updatedUser = existingUser.get();
@@ -63,10 +72,10 @@ public class UserService implements UserDetailsService {
 
     }
 
-    public Pair<Optional<User>, String> deleteUser(Integer id) {
-        Optional<User> existingUser = findUserById(id);
+    public Pair<Optional<User>, String> deleteUser(String name) {
+        Optional<User> existingUser = findUserByUsername(name);
         if (existingUser.isEmpty()) {
-            return Pair.of(Optional.empty(), "User with this id doesn't exists");
+            return Pair.of(Optional.empty(), "User with this name doesn't exists");
         }
 
         User user = existingUser.get();
@@ -87,14 +96,10 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public Optional<User> findUserById(Integer id) {
-        return userRepository.findById(id);
-    }
-
     public Pair<Optional<User>, String> updatePassword(ChangePasswordDto changePasswordDto) {
         Optional<User> existingUser = findUserByResetCode(changePasswordDto.getResetCode());
-        if (existingUser.isPresent()) {
-            return Pair.of(Optional.empty(), "Invalid user");
+        if (existingUser.isEmpty()) {
+            return Pair.of(Optional.empty(), "Invalid reset code");
         }
 
         User user = existingUser.get();

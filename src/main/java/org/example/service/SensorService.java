@@ -37,25 +37,21 @@ public class SensorService {
     }
 
     public Pair<Optional<Sensor>, String> updateSensor(UpdateSensorDto updateSensorDto) {
-        Optional<Sensor> existingSensor = findSensorById(updateSensorDto.getId());
-        Optional<Device> existingDevice = deviceService.findDeviceById(updateSensorDto.getId());
-        if (existingDevice.isEmpty()) {
-            return Pair.of(Optional.empty(), "Device with this id doesn't exists");
-        }
+        Optional<Sensor> existingSensor = findSensorByName(updateSensorDto.getOldName());
 
         if (existingSensor.isPresent()) {
             Sensor updatedSensor = existingSensor.get();
-            updatedSensor.setName(updateSensorDto.getName());
+            updatedSensor.setName(updateSensorDto.getNewName());
             return Pair.of(Optional.of(sensorRepository.save(updatedSensor)), StringUtils.EMPTY);
         }
 
-        return Pair.of(Optional.empty(), "Sensor with this id doesn't exists");
+        return Pair.of(Optional.empty(), "Sensor with this name doesn't exists");
     }
 
-    public Pair<Optional<Sensor>, String> deleteSensor(Integer id) {
-        Optional<Sensor> existingSensor = findSensorById(id);
+    public Pair<Optional<Sensor>, String> deleteSensor(String name) {
+        Optional<Sensor> existingSensor = findSensorByName(name);
         if (existingSensor.isEmpty()) {
-            return Pair.of(Optional.empty(), "Sensor with this id doesn't exists");
+            return Pair.of(Optional.empty(), "Sensor with this name doesn't exists");
         }
         Sensor deletedSensor = existingSensor.get();
 

@@ -1,11 +1,13 @@
 package org.example.dto;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @AllArgsConstructor
@@ -13,10 +15,10 @@ import java.util.List;
 @Data
 public class UpdateDeviceDto {
 
-    private Integer id;
-
+    @Schema(description = "Updated device name", example = "my_device_1")
+    @NotBlank(message = "Name is required.")
     private String name;
 
-    @Nullable
-    private List<Integer> sensorsId;
+    @Schema(description = "Sensors names, which are assigned to device", example = "my_sensor_1")
+    private List<String> sensorsNames;
 }

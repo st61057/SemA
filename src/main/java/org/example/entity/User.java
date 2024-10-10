@@ -2,7 +2,6 @@ package org.example.entity;
 
 import javax.persistence.*;
 import lombok.*;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,28 +14,26 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Table(name = "app_user")
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column(nullable = false)
+    @Column
     private String email;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
-    @Column(nullable = false)
+    @Column
     private String resetCode;
 
-    @OneToMany
-    @JoinColumn(name = "devices_id")
-    @Nullable
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     private List<Device> devices;
 
     public User(String username, String email, String password) {

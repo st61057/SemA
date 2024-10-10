@@ -1,25 +1,22 @@
 package org.example.controller;
 
-import org.example.dto.ChangePasswordDto;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.example.dto.NewPasswordDto;
 import org.example.dto.UpdateUserDto;
 import org.example.dto.UserDto;
 import org.example.entity.User;
 import org.example.service.UserService;
 import org.modelmapper.ModelMapper;
-import org.simplejavamail.api.email.Email;
-import org.simplejavamail.api.mailer.Mailer;
-import org.simplejavamail.api.mailer.config.TransportStrategy;
-import org.simplejavamail.email.EmailBuilder;
-import org.simplejavamail.mailer.MailerBuilder;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
-import java.util.UUID;
 
-//@CrossOrigin(origins = "*", maxAge = 3600)
+@Tag(name = "User", description = "Users")
 @RestController
 @RequestMapping(path = "/api")
 public class UserController {
@@ -35,8 +32,16 @@ public class UserController {
     }
 
 
-
     @PutMapping(value = "/update-user")
+    @Operation(
+            summary = "Update user information",
+            description = "Enables update users username, email, assigned devices",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User updated successfully"),
+                    @ApiResponse(responseCode = "500", description = "Internal server error - Failed to update user"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing token")
+            }
+    )
     public ResponseEntity<?> updateUser(@RequestBody UpdateUserDto userDto) {
         Pair<Optional<User>, String> update = userService.updateUser(userDto);
         Optional<User> device = update.getFirst();
@@ -46,44 +51,47 @@ public class UserController {
         return ResponseEntity.badRequest().body(update.getSecond());
     }
 
-    @DeleteMapping(value = "/delete-user/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Integer id) {
-        Pair<Optional<User>, String> delete = userService.deleteUser(id);
+    @DeleteMapping(value = "/delete-user/{name}")
+    @Operation(
+            summary = "Delete user ",
+            description = "Deletes users account",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User deleted successfully"),
+                    @ApiResponse(responseCode = "401", description = "Invalid users name")
+            }
+    )
+    public ResponseEntity<?> deleteUser(@PathVariable String name) {
+        Pair<Optional<User>, String> delete = userService.deleteUser(name);
         Optional<User> sensor = delete.getFirst();
         if (sensor.isPresent()) {
             return ResponseEntity.ok(convertUserToDto(sensor.get()));
         }
-        return ResponseEntity.badRequest().body(delete.getSecond());
-    }
-
-
-    @PostMapping(value = "/reset-request/{username}")
-    public ResponseEntity<?> sendResetCode(@RequestBody String username) {
-        Optional<User> existingUser = userService.findUserByUsername(username);
-        if (existingUser.isPresent()) {
-            String resetCode = UUID.randomUUID().toString();
-            existingUser.get().setResetCode(resetCode);
-            User updatedUser = userService.updateUser(existingUser.get());
-            sendEmail(updatedUser.getUsername(), updatedUser.getEmail(), resetCode);
-            return ResponseEntity.ok(convertUserToDto(updatedUser));
-
-        }
-        return ResponseEntity.badRequest().body("User doesn't exist");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(delete.getSecond());
     }
 
     @PutMapping(value = "/change-password")
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
-        Pair<Optional<User>, String> update = userService.updatePassword(changePasswordDto);
-        Optional<User> updateUser = update.getFirst();
-        if (updateUser.isPresent()) {
-            return ResponseEntity.ok(convertUserToDto(updateUser.get()));
-        }
-        return ResponseEntity.badRequest().body(update.getSecond());
-    }
+    @Operation(
+            summary = "Change password",
+            description = "Change the current user's password by providing the old password and a new password.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Password changed successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid old password or other error")
+            }
+    )
+    public ResponseEntity<?> changePasswordOnExistingUser(@RequestBody NewPasswordDto userDto) {
+        Optional<User> existingUser = userService.findUserByUsername(userDto.getUsername());
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            boolean isCurrentPasswordMatching = user.getPassword().equals(userDto.getOldPassword());
+            boolean isNewPasswordDifferent = userDto.getNewPassword().equals(userDto.getOldPassword());
 
-    @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public ResponseEntity<?> logout() throws AuthenticationException {
-        return ResponseEntity.ok("Successfully log out");
+            if (isCurrentPasswordMatching && isNewPasswordDifferent) {
+                return ResponseEntity.ok(convertUserToDto(existingUser.get()));
+            }
+
+            return ResponseEntity.badRequest().body("Problem with password doesn't match or new is similar as current");
+        }
+        return ResponseEntity.badRequest().body("User doesn't exist");
     }
 
     private UserDto convertUserToDto(User user) {
@@ -92,25 +100,6 @@ public class UserController {
         userDto.setEmail(user.getEmail());
         userDto.setDevices(user.getDevices());
         return userDto;
-    }
-
-    private void sendEmail(String username, String userEmail, String resetCode) {
-        Email email = EmailBuilder.startingBlank()
-                .from("Test", "test@gmail.com")
-                .to(username, userEmail)
-                .withSubject("Reset code")
-                .withPlainText("Reset code: " + resetCode)
-                .buildEmail();
-
-
-        Mailer mailer = MailerBuilder
-                .withSMTPServer("smtp.gmail.com", 587, "test@gmail.com", "your-password")
-                .withTransportStrategy(TransportStrategy.SMTP_TLS)
-                .buildMailer();
-
-        mailer.sendMail(email);
-
-        System.out.println("Email sent successfully!");
     }
 
 }
