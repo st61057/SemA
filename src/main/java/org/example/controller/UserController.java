@@ -1,8 +1,11 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.example.dto.basic.LoginDto;
 import org.example.dto.updates.NewPasswordDto;
 import org.example.dto.updates.UpdateUserDto;
 import org.example.dto.basic.UserDto;
@@ -12,6 +15,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -31,6 +36,19 @@ public class UserController {
         this.modelMapper = modelMapper;
     }
 
+    @GetMapping("/user-info")
+    public ResponseEntity<?> getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        String username = user.getUsername();
+        Optional<User> existingUser = userService.findUserByUsername(username);
+        if (existingUser.isPresent()) {
+            return ResponseEntity.ok(convertUserToDto(existingUser.get()));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
+    }
+
 
     @PutMapping(value = "/update-user")
     @Operation(
@@ -44,9 +62,9 @@ public class UserController {
     )
     public ResponseEntity<?> updateUser(@RequestBody UpdateUserDto userDto) {
         Pair<Optional<User>, String> update = userService.updateUser(userDto);
-        Optional<User> device = update.getFirst();
-        if (device.isPresent()) {
-            return ResponseEntity.ok(convertUserToDto(device.get()));
+        Optional<User> user = update.getFirst();
+        if (user.isPresent()) {
+            return ResponseEntity.ok(convertUserToDto(user.get()));
         }
         return ResponseEntity.badRequest().body(update.getSecond());
     }
@@ -62,9 +80,9 @@ public class UserController {
     )
     public ResponseEntity<?> deleteUser(@PathVariable String name) {
         Pair<Optional<User>, String> delete = userService.deleteUser(name);
-        Optional<User> sensor = delete.getFirst();
-        if (sensor.isPresent()) {
-            return ResponseEntity.ok(convertUserToDto(sensor.get()));
+        Optional<User> user = delete.getFirst();
+        if (user.isPresent()) {
+            return ResponseEntity.ok(convertUserToDto(user.get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(delete.getSecond());
     }

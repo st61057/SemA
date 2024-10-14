@@ -9,7 +9,9 @@ import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,13 +27,13 @@ public class Device {
     @Column(nullable = false)
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @ManyToMany(mappedBy = "devices")
     @JsonIgnore
-    private User user;
+    private Set<User> user;
 
     @OneToMany(mappedBy = "device", fetch = FetchType.EAGER)
-    private List<Sensor> sensorList = new ArrayList<>();
+    @JsonIgnore
+    private List<Sensor> sensorList = Collections.EMPTY_LIST;
 
     public Device(String name, List<Sensor> sensorList) {
         this.name = name;

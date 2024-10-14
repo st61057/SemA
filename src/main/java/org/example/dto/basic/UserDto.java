@@ -7,6 +7,7 @@ import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,6 +24,6 @@ public class UserDto {
     private String password;
 
     @Schema(description = "Users devices", example = "Xyzui")
-    private List<Device> devices;
+    private Set<Device> devices;
 
 }
