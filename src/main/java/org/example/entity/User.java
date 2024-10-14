@@ -1,13 +1,17 @@
 package org.example.entity;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,8 +37,17 @@ public class User implements UserDetails {
     @Column
     private String resetCode;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
-    private List<Device> devices;
+    @Column
+    private Timestamp resetCodeTimestamp;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_device",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "device_id")
+    )
+    @JsonIgnore
+    private Set<Device> devices;
 
     public User(String username, String email, String password) {
         this.username = username;

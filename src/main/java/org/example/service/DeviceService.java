@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,11 +83,11 @@ public class DeviceService {
             return Pair.of(Optional.empty(), "Device with this name doesn't exists");
         }
 
-        List<User> users = userRepository.findUsersByDevices(existingDevice.get());
+        Set<User> users = userRepository.findUsersByDevices(existingDevice.get());
         users.forEach(user -> user.setDevices(
                 user.getDevices().stream()
                         .filter(device -> !device.getId().equals(existingDevice.get().getId()))
-                        .collect(Collectors.toList())));
+                        .collect(Collectors.toSet())));
 
         Device device = existingDevice.get();
         List<Sensor> sensors = new ArrayList<>();
@@ -100,11 +101,6 @@ public class DeviceService {
         return Pair.of(Optional.of(device), StringUtils.EMPTY);
     }
 
-
-    public Optional<Device> findDeviceById(Integer id) {
-        return deviceRepository.findById(id);
-    }
-
     public List<Device> findDevicesBySensorListContains(Sensor sensor) {
         return deviceRepository.findDevicesBySensorListContains(sensor);
     }
@@ -116,7 +112,6 @@ public class DeviceService {
     public void deleteDevice(Device device) {
         deviceRepository.delete(device);
     }
-
 
     public List<Device> findAllDevices() {
         return deviceRepository.findAll();

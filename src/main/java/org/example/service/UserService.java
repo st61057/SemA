@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -38,6 +40,7 @@ public class UserService implements UserDetailsService {
         if (!findUserByUsername(registerDto.getUsername()).isPresent()) {
             User user = new User(registerDto.getUsername(), registerDto.getEmail(), passwordEncoder.encode(registerDto.getPassword()));
             user.setResetCode(UUID.randomUUID().toString());
+            user.setResetCodeTimestamp(Timestamp.valueOf(LocalDateTime.now()));
             return Pair.of(Optional.of(userRepository.save(user)), StringUtils.EMPTY);
         }
         return Pair.of(Optional.empty(), "User with this name already exists!");
@@ -51,7 +54,7 @@ public class UserService implements UserDetailsService {
             return Pair.of(Optional.empty(), "User with this name doesn't exists");
         }
 
-        List<Device> listOfDevices = new ArrayList<>();
+        Set<Device> listOfDevices = new HashSet<>();
 
         if (!updateUserDto.getDevicesNames().isEmpty()) {
             for (String deviceId : updateUserDto.getDevicesNames()) {
@@ -61,7 +64,7 @@ public class UserService implements UserDetailsService {
                 }
 
                 Device device = existingDevice.get();
-                device.setUser(existingUser.get());
+                device.getUser().add(existingUser.get());
                 listOfDevices.add(existingDevice.get());
             }
         }
@@ -83,8 +86,8 @@ public class UserService implements UserDetailsService {
 
         User user = existingUser.get();
 
-        List<Device> devices = new ArrayList<>();
-        for (Device device : user.getDevices()){
+        Set<Device> devices = Collections.EMPTY_SET;
+        for (Device device : user.getDevices()) {
             device.setUser(null);
             devices.add(device);
         }
