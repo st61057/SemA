@@ -4,8 +4,10 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.example.config.JwtTokenUtil;
 import org.example.dto.updates.ChangePasswordDto;
 import org.example.dto.basic.LoginDto;
 import org.example.dto.updates.RegisterDto;
@@ -37,6 +39,8 @@ public class AuthenticationController {
 
     private final ModelMapper modelMapper;
 
+    private final JwtTokenUtil jwtTokenUtil;
+
 
     @PostMapping("/login")
     @Operation(
@@ -56,8 +60,8 @@ public class AuthenticationController {
         }
         boolean isAuthenticated = userService.authenticated(login.get(), loginDto);
         if (isAuthenticated) {
-//            String token = jwtTokenUtil.generateToken(login.get().getUsername());
-            return ResponseEntity.ok(new AuthToken("token"));
+            String token = jwtTokenUtil.generateToken(login.get().getUsername());
+            return ResponseEntity.ok(new AuthToken(token));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
 
