@@ -9,7 +9,6 @@ import org.example.dto.updates.ChangePasswordDto;
 import org.example.dto.updates.RegisterDto;
 import org.example.dto.updates.UpdateUserDto;
 import org.example.entity.Device;
-import org.example.entity.Sensor;
 import org.example.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -86,7 +85,7 @@ public class UserService implements UserDetailsService {
 
         User user = existingUser.get();
 
-        Set<Device> devices = Collections.EMPTY_SET;
+        Set<Device> devices = new HashSet<>();
         for (Device device : user.getDevices()) {
             device.setUser(null);
             devices.add(device);

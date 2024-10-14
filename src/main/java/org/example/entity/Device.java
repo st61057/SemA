@@ -33,7 +33,7 @@ public class Device {
 
     @OneToMany(mappedBy = "device", fetch = FetchType.EAGER)
     @JsonIgnore
-    private List<Sensor> sensorList = Collections.EMPTY_LIST;
+    private List<Sensor> sensorList = new ArrayList<>();
 
     public Device(String name, List<Sensor> sensorList) {
         this.name = name;

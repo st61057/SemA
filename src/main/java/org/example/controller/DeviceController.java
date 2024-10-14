@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import org.example.dto.basic.DeviceDto;
 import org.example.dto.updates.UpdateDeviceDto;
 import org.example.entity.Device;
@@ -14,7 +15,6 @@ import org.example.service.DeviceService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Tag(name = "Device", description = "Devices for users")
-@Controller
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "/api")
 public class DeviceController {
@@ -30,11 +30,6 @@ public class DeviceController {
     private final DeviceService deviceService;
 
     private final ModelMapper modelMapper;
-
-    public DeviceController(DeviceService deviceService, ModelMapper modelMapper) {
-        this.deviceService = deviceService;
-        this.modelMapper = modelMapper;
-    }
 
     @GetMapping("/all-devices")
     @Operation(

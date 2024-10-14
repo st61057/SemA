@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AllArgsConstructor;
 import org.example.dto.basic.SensorDto;
 import org.example.dto.updates.UpdateSensorDto;
 import org.example.entity.Sensor;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Tag(name = "Sensor", description = "Sensors for devices")
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "/api")
 public class SensorController {
@@ -29,10 +31,6 @@ public class SensorController {
 
     private final ModelMapper modelMapper;
 
-    public SensorController(SensorService sensorService, ModelMapper modelMapper) {
-        this.sensorService = sensorService;
-        this.modelMapper = modelMapper;
-    }
 
     @GetMapping("/all-sensors")
     @Operation(
