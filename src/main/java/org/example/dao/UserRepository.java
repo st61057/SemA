@@ -17,7 +17,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findUserByResetCode(String resetCode);
 
-    Set<User> findUsersByDevices(Device device);
+    Set<User> findUsersByDevice(Device device);
 
     List<User> findUsersByResetCodeTimestampBetween(Timestamp f, Timestamp s);
 

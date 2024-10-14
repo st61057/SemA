@@ -1,11 +1,9 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.example.dto.basic.LoginDto;
+import lombok.AllArgsConstructor;
 import org.example.dto.updates.NewPasswordDto;
 import org.example.dto.updates.UpdateUserDto;
 import org.example.dto.basic.UserDto;
@@ -22,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @Tag(name = "User", description = "Users")
+@AllArgsConstructor
 @RestController
 @RequestMapping(path = "/api")
 public class UserController {
@@ -30,11 +29,6 @@ public class UserController {
 
     private final ModelMapper modelMapper;
 
-
-    public UserController(UserService userService, ModelMapper modelMapper) {
-        this.userService = userService;
-        this.modelMapper = modelMapper;
-    }
 
     @GetMapping("/user-info")
     public ResponseEntity<?> getUser() {
