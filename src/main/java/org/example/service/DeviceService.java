@@ -83,7 +83,7 @@ public class DeviceService {
             return Pair.of(Optional.empty(), "Device with this name doesn't exists");
         }
 
-        Set<User> users = userRepository.findUsersByDevice(existingDevice.get());
+        Set<User> users = userRepository.findUsersByDevices(existingDevice.get());
         users.forEach(user -> user.setDevices(
                 user.getDevices().stream()
                         .filter(device -> !device.getId().equals(existingDevice.get().getId()))
