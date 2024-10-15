@@ -109,10 +109,6 @@ public class DeviceService {
         return deviceRepository.findByName(name);
     }
 
-    public void deleteDevice(Device device) {
-        deviceRepository.delete(device);
-    }
-
     public List<Device> findAllDevices() {
         return deviceRepository.findAll();
     }
