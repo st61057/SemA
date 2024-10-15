@@ -56,7 +56,7 @@ public class SensorService {
         Sensor deletedSensor = existingSensor.get();
 
         List<Device> devices = deviceService.findDevicesBySensorListContains(deletedSensor);
-        devices.forEach(device -> deviceService.deleteDevice(device));
+        devices.forEach(device -> device.getSensorList().remove(existingSensor));
 
         sensorRepository.delete(deletedSensor);
         return Pair.of(Optional.of(deletedSensor), StringUtils.EMPTY);
