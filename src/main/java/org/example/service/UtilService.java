@@ -21,7 +21,7 @@ public class UtilService {
     @Autowired
     private UserService userService;
 
-    @Scheduled(fixedRate = 2000)
+    @Scheduled(fixedRate = 3600000)
     @Transactional
     public void validateResetCodesValidity() {
         Timestamp currentTime = Timestamp.valueOf(LocalDateTime.now());

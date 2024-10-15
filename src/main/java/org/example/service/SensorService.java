@@ -66,8 +66,4 @@ public class SensorService {
         return sensorRepository.findByName(name);
     }
 
-    public Optional<Sensor> findSensorById(Integer id) {
-        return sensorRepository.findById(id);
-    }
-
 }
