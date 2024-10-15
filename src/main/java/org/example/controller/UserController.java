@@ -31,7 +31,9 @@ public class UserController {
     private final ModelMapper modelMapper;
 
     @GetMapping("/user-info")
-    public ResponseEntity<?> getUser(@AuthenticationPrincipal User user) {
+    public ResponseEntity<?> getUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
         String username = user.getUsername();
         Optional<User> existingUser = userService.findUserByUsername(username);
         if (existingUser.isPresent()) {

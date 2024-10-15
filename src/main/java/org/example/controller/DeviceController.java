@@ -40,7 +40,6 @@ public class DeviceController {
                     @ApiResponse(responseCode = "200", description = "Devices retrieved successfully", content = @Content(array = @ArraySchema())),
             }
     )
-    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<?> getAllDevices() {
         List<Device> sensors = deviceService.findAllDevices();
         return ResponseEntity.ok(sensors.stream().map(this::convertDeviceToDto).collect(Collectors.toList()));
