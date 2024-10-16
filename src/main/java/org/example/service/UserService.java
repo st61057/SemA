@@ -4,7 +4,7 @@ package org.example.service;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.example.dao.UserRepository;
-import org.example.dto.basic.LoginDto;
+import org.example.dto.basic.UserDeviceDto;
 import org.example.dto.updates.ChangePasswordDto;
 import org.example.dto.updates.RegisterDto;
 import org.example.dto.updates.UpdateUserDto;
@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -46,6 +45,54 @@ public class UserService implements UserDetailsService {
         return Pair.of(Optional.empty(), "User with this name already exists!");
     }
 
+    public Pair<Optional<User>, String> addDeviceToUser(UserDeviceDto userDeviceDto) {
+
+        Optional<User> existingUser = findUserByUsername(userDeviceDto.getUsername());
+        if (existingUser.isEmpty()) {
+            return Pair.of(Optional.empty(), "User with this name doesn't exists");
+        }
+
+        Optional<Device> existingDevice = deviceService.findDeviceByName(userDeviceDto.getDeviceName());
+        if (existingDevice.isEmpty()) {
+            return Pair.of(Optional.empty(), "Device with this name doesn't exists");
+        }
+
+        User user = existingUser.get();
+        Device device = existingDevice.get();
+        if (user.getDevices().contains(device)) {
+            return Pair.of(Optional.empty(), "Device is already assigned to this user");
+        }
+
+        user.getDevices().add(device);
+        device.getUser().add(user);
+
+        return Pair.of(Optional.of(userRepository.save(user)), StringUtils.EMPTY);
+    }
+
+    public Pair<Optional<User>, String> removeDeviceFromUser(UserDeviceDto userDeviceDto) {
+
+        Optional<User> existingUser = findUserByUsername(userDeviceDto.getUsername());
+        if (existingUser.isEmpty()) {
+            return Pair.of(Optional.empty(), "User with this name doesn't exists");
+        }
+
+        Optional<Device> existingDevice = deviceService.findDeviceByName(userDeviceDto.getDeviceName());
+        if (existingDevice.isEmpty()) {
+            return Pair.of(Optional.empty(), "Device with this name doesn't exists");
+        }
+
+        User user = existingUser.get();
+        Device device = existingDevice.get();
+
+        if (user.getDevices().isEmpty()) {
+            return Pair.of(Optional.empty(), "Device isn't connected to this user");
+        } else {
+            user.getDevices().remove(device);
+        }
+
+        return Pair.of(Optional.of(userRepository.save(user)), StringUtils.EMPTY);
+    }
+
     public Pair<Optional<User>, String> updateUser(UpdateUserDto updateUserDto) {
 
         Optional<User> existingUser = findUserByUsername(updateUserDto.getUsername());
@@ -54,22 +101,22 @@ public class UserService implements UserDetailsService {
             return Pair.of(Optional.empty(), "User with this name doesn't exists");
         }
 
+        User updatedUser = existingUser.get();
         Set<Device> listOfDevices = new HashSet<>();
 
         if (!updateUserDto.getDevicesNames().isEmpty()) {
-            for (String deviceId : updateUserDto.getDevicesNames()) {
-                Optional<Device> existingDevice = deviceService.findDeviceByName(deviceId);
+            for (String deviceName : updateUserDto.getDevicesNames()) {
+                Optional<Device> existingDevice = deviceService.findDeviceByName(deviceName);
                 if (existingDevice.isEmpty()) {
-                    return Pair.of(Optional.empty(), "Device with id" + deviceId + " doesn't exists");
+                    return Pair.of(Optional.empty(), "Device with name " + deviceName + " doesn't exists");
                 }
 
                 Device device = existingDevice.get();
-                device.getUser().add(existingUser.get());
+                device.getUser().add(updatedUser);
                 listOfDevices.add(existingDevice.get());
             }
         }
 
-        User updatedUser = existingUser.get();
         updatedUser.setUsername(updateUserDto.getUsername());
         updatedUser.setEmail(updateUserDto.getEmail());
         updatedUser.setDevices(listOfDevices);
