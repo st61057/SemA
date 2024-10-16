@@ -58,7 +58,7 @@ public class AuthenticationController {
         if (login.isEmpty()) {
             return ResponseEntity.badRequest().body("User doesn't exists");
         }
-        boolean isAuthenticated = userService.authenticated(login.get(), loginDto);
+        boolean isAuthenticated = userService.authenticated(login.get(), loginDto.getPassword());
         if (isAuthenticated) {
             String token = jwtTokenUtil.generateToken(login.get().getUsername());
             return ResponseEntity.ok(new AuthToken(token));

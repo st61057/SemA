@@ -46,6 +46,8 @@ public class DeviceService {
                 }
             }
             Device device = new Device(deviceDto.getName(), sensors);
+            device.setSensorList(sensors);
+            sensors.forEach(sensor -> sensor.setDevice(device));
             return Pair.of(Optional.of(deviceRepository.save(device)), StringUtils.EMPTY);
         }
         return Pair.of(Optional.empty(), "Device with this name already exists!");
