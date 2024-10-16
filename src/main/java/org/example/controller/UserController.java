@@ -14,8 +14,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
@@ -29,6 +29,8 @@ public class UserController {
     private final UserService userService;
 
     private final ModelMapper modelMapper;
+
+    private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/user-info")
     public ResponseEntity<?> getUser() {
@@ -90,19 +92,17 @@ public class UserController {
             }
     )
     public ResponseEntity<?> changePasswordOnExistingUser(@RequestBody NewPasswordDto userDto) {
-        Optional<User> existingUser = userService.findUserByUsername(userDto.getUsername());
-        if (existingUser.isPresent()) {
-            User user = existingUser.get();
-            boolean isCurrentPasswordMatching = user.getPassword().equals(userDto.getOldPassword());
-            boolean isNewPasswordDifferent = userDto.getNewPassword().equals(userDto.getOldPassword());
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+        boolean isCurrentPasswordMatching = userService.authenticated(user, userDto.getOldPassword());
+        boolean isNewPasswordDifferent = !userDto.getNewPassword().equals(userDto.getOldPassword());
 
-            if (isCurrentPasswordMatching && isNewPasswordDifferent) {
-                return ResponseEntity.ok(convertUserToDto(existingUser.get()));
-            }
-
-            return ResponseEntity.badRequest().body("Problem with password doesn't match or new is similar as current");
+        if (isCurrentPasswordMatching && isNewPasswordDifferent) {
+            user.setPassword(passwordEncoder.encode(userDto.getNewPassword()));
+            return ResponseEntity.ok(convertUserToDto(userService.updateUser(user)));
         }
-        return ResponseEntity.badRequest().body("User doesn't exist");
+
+        return ResponseEntity.badRequest().body("Problem with password doesn't match or new is similar as current");
     }
 
     private UserDto convertUserToDto(User user) {

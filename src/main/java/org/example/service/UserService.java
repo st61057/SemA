@@ -40,6 +40,7 @@ public class UserService implements UserDetailsService {
             User user = new User(registerDto.getUsername(), registerDto.getEmail(), passwordEncoder.encode(registerDto.getPassword()));
             user.setResetCode(UUID.randomUUID().toString());
             user.setResetCodeTimestamp(Timestamp.valueOf(LocalDateTime.now()));
+            user.setDevices(new HashSet<>());
             return Pair.of(Optional.of(userRepository.save(user)), StringUtils.EMPTY);
         }
         return Pair.of(Optional.empty(), "User with this name already exists!");
@@ -70,7 +71,7 @@ public class UserService implements UserDetailsService {
 
         User updatedUser = existingUser.get();
         updatedUser.setUsername(updateUserDto.getUsername());
-        updatedUser.setEmail(updatedUser.getEmail());
+        updatedUser.setEmail(updateUserDto.getEmail());
         updatedUser.setDevices(listOfDevices);
 
         return Pair.of(Optional.of(userRepository.save(updatedUser)), StringUtils.EMPTY);
@@ -116,7 +117,7 @@ public class UserService implements UserDetailsService {
 
         User user = existingUser.get();
         if (validatePassword(changePasswordDto, user)) {
-            user.setPassword(changePasswordDto.getNewPassword());
+            user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
             return Pair.of(Optional.of(userRepository.save(user)), StringUtils.EMPTY);
         }
 
@@ -139,8 +140,8 @@ public class UserService implements UserDetailsService {
         return login.get();
     }
 
-    public boolean authenticated(User user, LoginDto loginDto) {
-        return passwordEncoder.matches(loginDto.getPassword(), user.getPassword());
+    public boolean authenticated(User user, String password) {
+        return passwordEncoder.matches(password, user.getPassword());
     }
 
 }
