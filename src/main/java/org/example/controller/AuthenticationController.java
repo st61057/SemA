@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.example.config.JwtTokenUtil;
@@ -47,7 +46,7 @@ public class AuthenticationController {
             summary = "Authenticate for an existing user",
             description = "Login to existing user via username and password",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "User authenticated successfully", content = @Content(schema = @Schema(implementation = LoginDto.class))),
+                    @ApiResponse(responseCode = "200", description = "User authenticated successfully", content = @Content(schema = @Schema(implementation = AuthToken.class))),
                     @ApiResponse(responseCode = "401", description = "Invalid credentials"),
                     @ApiResponse(responseCode = "400", description = "User doesn't exists")
             }
@@ -72,7 +71,7 @@ public class AuthenticationController {
             summary = "Register new user",
             description = "Create new user account via username, password and email",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "User registered successfully", content = @Content(schema = @Schema(implementation = User.class))),
+                    @ApiResponse(responseCode = "201", description = "User registered successfully", content = @Content(schema = @Schema(implementation = UserDto.class))),
                     @ApiResponse(responseCode = "400", description = "User is already existing")
             }
     )

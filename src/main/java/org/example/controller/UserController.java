@@ -1,9 +1,12 @@
 package org.example.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.example.dto.basic.UserDeviceDto;
 import org.example.dto.updates.NewPasswordDto;
 import org.example.dto.updates.UpdateUserDto;
 import org.example.dto.basic.UserDto;
@@ -42,6 +45,44 @@ public class UserController {
             return ResponseEntity.ok(convertUserToDto(existingUser.get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
+    }
+
+
+    @PostMapping(value = "/user-add-device")
+    @Operation(
+            summary = "Add device to user",
+            description = "Adding new device to existing user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Device added to user successfully", content = @Content(schema = @Schema(implementation = UserDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
+            }
+    )
+    public ResponseEntity<?> addSensorToDevice(@RequestBody UserDeviceDto userDeviceDto) {
+        Pair<Optional<User>, String> add = userService.addDeviceToUser(userDeviceDto);
+        Optional<User> user = add.getFirst();
+        if (user.isPresent()) {
+            return ResponseEntity.ok(convertUserToDto(user.get()));
+        }
+        return ResponseEntity.badRequest().body(add.getSecond());
+    }
+
+
+    @PostMapping(value = "/user-remove-device")
+    @Operation(
+            summary = "Removing device from user",
+            description = "Removing device from existing user",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Device removed from device successfully", content = @Content(schema = @Schema(implementation = UserDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
+            }
+    )
+    public ResponseEntity<?> removeSensorFromDevice(@RequestBody UserDeviceDto userDeviceDto) {
+        Pair<Optional<User>, String> remove = userService.removeDeviceFromUser(userDeviceDto);
+        Optional<User> user = remove.getFirst();
+        if (user.isPresent()) {
+            return ResponseEntity.ok(convertUserToDto(user.get()));
+        }
+        return ResponseEntity.badRequest().body(remove.getSecond());
     }
 
 

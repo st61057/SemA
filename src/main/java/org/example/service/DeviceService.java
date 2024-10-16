@@ -2,9 +2,9 @@ package org.example.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.example.dao.DeviceRepository;
-import org.example.dao.SensorRepository;
 import org.example.dao.UserRepository;
 import org.example.dto.basic.DeviceDto;
+import org.example.dto.basic.DeviceSensorDto;
 import org.example.dto.updates.UpdateDeviceDto;
 import org.example.entity.Device;
 import org.example.entity.Sensor;
@@ -13,10 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,7 +23,7 @@ public class DeviceService {
     private DeviceRepository deviceRepository;
 
     @Autowired
-    private SensorRepository sensorRepository;
+    private SensorService sensorService;
 
     @Autowired
     private UserRepository userRepository;
@@ -38,7 +35,7 @@ public class DeviceService {
 
             if (deviceDto.getSensorsName() != null) {
                 for (String sensorName : deviceDto.getSensorsName()) {
-                    Optional<Sensor> sensor = sensorRepository.findByName(sensorName);
+                    Optional<Sensor> sensor = sensorService.findSensorByName(sensorName);
                     if (sensor.isEmpty()) {
                         return Pair.of(Optional.empty(), "Sensor with this name " + sensorName + " doesn't exists!");
                     }
@@ -53,6 +50,55 @@ public class DeviceService {
         return Pair.of(Optional.empty(), "Device with this name already exists!");
     }
 
+    public Pair<Optional<Device>, String> addSensorToDevice(DeviceSensorDto deviceSensorDto) {
+
+        Optional<Device> existingDevice = findDeviceByName(deviceSensorDto.getName());
+        if (existingDevice.isEmpty()) {
+            return Pair.of(Optional.empty(), "Device with this name doesn't exists");
+        }
+
+        Optional<Sensor> existingSensor = sensorService.findSensorByName(deviceSensorDto.getSensorName());
+        if (existingSensor.isEmpty()) {
+            return Pair.of(Optional.empty(), "Sensor with this name doesn't exists");
+        }
+
+        Device device = existingDevice.get();
+        Sensor sensor = existingSensor.get();
+        if (device.getSensorList().contains(sensor)){
+            return Pair.of(Optional.empty(), "Sensor is already assigned to this device");
+        }
+
+        device.getSensorList().add(sensor);
+        sensor.setDevice(device);
+
+        return Pair.of(Optional.of(deviceRepository.save(device)), StringUtils.EMPTY);
+    }
+
+    public Pair<Optional<Device>, String> removeSensorFromDevice(DeviceSensorDto deviceSensorDto) {
+
+        Optional<Device> existingDevice = findDeviceByName(deviceSensorDto.getName());
+        if (existingDevice.isEmpty()) {
+            return Pair.of(Optional.empty(), "Device with this name doesn't exists");
+        }
+
+        Optional<Sensor> existingSensor = sensorService.findSensorByName(deviceSensorDto.getSensorName());
+        if (existingSensor.isEmpty()) {
+            return Pair.of(Optional.empty(), "Sensor with this name doesn't exists");
+        }
+
+        Device device = existingDevice.get();
+        Sensor sensor = existingSensor.get();
+
+        if (device.getSensorList().isEmpty()) {
+            return Pair.of(Optional.empty(), "Sensor isn't connected to this device");
+        } else {
+            device.getSensorList().remove(sensor);
+        }
+        sensor.setDevice(null);
+
+        return Pair.of(Optional.of(deviceRepository.save(device)), StringUtils.EMPTY);
+    }
+
     public Pair<Optional<Device>, String> updateDevice(UpdateDeviceDto updateDeviceDto) {
         Optional<Device> existingDevice = findDeviceByName(updateDeviceDto.getName());
         if (existingDevice.isEmpty()) {
@@ -62,7 +108,7 @@ public class DeviceService {
         List<Sensor> sensors = new ArrayList<>();
         if (updateDeviceDto.getSensorsNames() != null) {
             for (String sensorName : updateDeviceDto.getSensorsNames()) {
-                Optional<Sensor> existingSensor = sensorRepository.findByName(sensorName);
+                Optional<Sensor> existingSensor = sensorService.findSensorByName(sensorName);
                 if (existingSensor.isEmpty()) {
                     return Pair.of(Optional.empty(), "Sensor with name " + sensorName + " doesn't exists");
                 }
@@ -93,7 +139,7 @@ public class DeviceService {
 
         Device device = existingDevice.get();
         List<Sensor> sensors = new ArrayList<>();
-        for (Sensor sensor : existingDevice.get().getSensorList()){
+        for (Sensor sensor : existingDevice.get().getSensorList()) {
             sensor.setDevice(null);
             sensors.add(sensor);
         }

@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.example.dto.basic.DeviceDto;
+import org.example.dto.basic.DeviceSensorDto;
 import org.example.dto.updates.UpdateDeviceDto;
 import org.example.entity.Device;
 import org.example.entity.Sensor;
@@ -61,6 +61,43 @@ public class DeviceController {
             return ResponseEntity.ok(convertDeviceToDto(sensor.get()));
         }
         return ResponseEntity.badRequest().body(creation.getSecond());
+    }
+
+    @PostMapping(value = "/device-add-sensor")
+    @Operation(
+            summary = "Adding sensor to device",
+            description = "Adding sensor to an existing device",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Sensor added to device successfully", content = @Content(schema = @Schema(implementation = DeviceDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
+            }
+    )
+    public ResponseEntity<?> addSensorToDevice(@RequestBody DeviceSensorDto deviceSensorDto) {
+        Pair<Optional<Device>, String> add = deviceService.addSensorToDevice(deviceSensorDto);
+        Optional<Device> device = add.getFirst();
+        if (device.isPresent()) {
+            return ResponseEntity.ok(convertDeviceToDto(device.get()));
+        }
+        return ResponseEntity.badRequest().body(add.getSecond());
+    }
+
+
+    @PostMapping(value = "/device-remove-sensor")
+    @Operation(
+            summary = "Removing sensor from device",
+            description = "Removing sensor from existing device",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Sensor removed from device successfully", content = @Content(schema = @Schema(implementation = DeviceDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
+            }
+    )
+    public ResponseEntity<?> removeSensorFromDevice(@RequestBody DeviceSensorDto deviceSensorDto) {
+        Pair<Optional<Device>, String> remove = deviceService.removeSensorFromDevice(deviceSensorDto);
+        Optional<Device> device = remove.getFirst();
+        if (device.isPresent()) {
+            return ResponseEntity.ok(convertDeviceToDto(device.get()));
+        }
+        return ResponseEntity.badRequest().body(remove.getSecond());
     }
 
     @PutMapping(value = "/device-update")
