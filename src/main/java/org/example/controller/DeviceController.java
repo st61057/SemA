@@ -140,6 +140,9 @@ public class DeviceController {
     private DeviceDto convertDeviceToDto(Device device) {
         DeviceDto deviceDto = modelMapper.map(device, DeviceDto.class);
         deviceDto.setName(device.getName());
+        deviceDto.setLocation(device.getLocation());
+        deviceDto.setLat(device.getLat());
+        deviceDto.setLon(deviceDto.getLon());
 
         List<Sensor> sensors = device.getSensorList();
         if (sensors != null) {

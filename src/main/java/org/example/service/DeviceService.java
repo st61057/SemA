@@ -42,8 +42,7 @@ public class DeviceService {
                     sensors.add(sensor.get());
                 }
             }
-            Device device = new Device(deviceDto.getName(), sensors);
-            device.setSensorList(sensors);
+            Device device = new Device(deviceDto.getName(), deviceDto.getLocation(), deviceDto.getLat(), deviceDto.getLon(), sensors);
             sensors.forEach(sensor -> sensor.setDevice(device));
             return Pair.of(Optional.of(deviceRepository.save(device)), StringUtils.EMPTY);
         }
@@ -64,7 +63,7 @@ public class DeviceService {
 
         Device device = existingDevice.get();
         Sensor sensor = existingSensor.get();
-        if (device.getSensorList().contains(sensor)){
+        if (device.getSensorList().contains(sensor)) {
             return Pair.of(Optional.empty(), "Sensor is already assigned to this device");
         }
 
@@ -158,6 +157,6 @@ public class DeviceService {
     }
 
     public List<Device> findAllDevices() {
-        return deviceRepository.findAll();
+        return (List<Device>) deviceRepository.findAll();
     }
 }

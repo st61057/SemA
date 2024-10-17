@@ -30,7 +30,7 @@ public class SensorService {
     public Pair<Optional<Sensor>, String> createSensor(SensorDto sensorDto) {
 
         if (!findSensorByName(sensorDto.getName()).isPresent()) {
-            Sensor sensor = new Sensor(sensorDto.getName());
+            Sensor sensor = new Sensor(sensorDto.getName(),sensorDto.getSensorTemperature(),sensorDto.getSensorUsageEnergy(), sensorDto.getSensorType());
             return Pair.of(Optional.of(sensorRepository.save(sensor)), StringUtils.EMPTY);
         }
         return Pair.of(Optional.empty(), "Sensor with this name already exists!");

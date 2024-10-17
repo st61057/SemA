@@ -31,12 +31,24 @@ public class Device {
     @JsonIgnore
     private Set<User> user;
 
+    @Column
+    private String location;
+
+    @Column
+    private Long lat;
+
+    @Column
+    private Long lon;
+
     @OneToMany(mappedBy = "device", fetch = FetchType.EAGER)
     @JsonIgnore
     private List<Sensor> sensorList = new ArrayList<>();
 
-    public Device(String name, List<Sensor> sensorList) {
+    public Device(String name, String location, Long lat, Long lon, List<Sensor> sensorList) {
         this.name = name;
+        this.location = location;
+        this.lat = lat;
+        this.lon = lon;
         this.sensorList = sensorList;
     }
 
