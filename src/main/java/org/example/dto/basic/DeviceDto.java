@@ -16,6 +16,7 @@ import java.util.List;
 public class DeviceDto {
 
     @Schema(description = "Device name", example = "Main device")
+    @NotBlank(message = "Name is required.")
     private String name;
 
     private List<String> sensorsName = new ArrayList<>();

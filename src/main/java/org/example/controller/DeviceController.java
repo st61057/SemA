@@ -18,6 +18,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class DeviceController {
                     @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
             }
     )
-    public ResponseEntity<?> addDevice(@RequestBody DeviceDto deviceDto) {
+    public ResponseEntity<?> addDevice(@Valid @RequestBody DeviceDto deviceDto) {
         Pair<Optional<Device>, String> creation = deviceService.createDevice(deviceDto);
         Optional<Device> sensor = creation.getFirst();
         if (sensor.isPresent()) {
@@ -72,7 +73,7 @@ public class DeviceController {
                     @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
             }
     )
-    public ResponseEntity<?> addSensorToDevice(@RequestBody DeviceSensorDto deviceSensorDto) {
+    public ResponseEntity<?> addSensorToDevice(@Valid @RequestBody DeviceSensorDto deviceSensorDto) {
         Pair<Optional<Device>, String> add = deviceService.addSensorToDevice(deviceSensorDto);
         Optional<Device> device = add.getFirst();
         if (device.isPresent()) {
@@ -91,7 +92,7 @@ public class DeviceController {
                     @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
             }
     )
-    public ResponseEntity<?> removeSensorFromDevice(@RequestBody DeviceSensorDto deviceSensorDto) {
+    public ResponseEntity<?> removeSensorFromDevice(@Valid @RequestBody DeviceSensorDto deviceSensorDto) {
         Pair<Optional<Device>, String> remove = deviceService.removeSensorFromDevice(deviceSensorDto);
         Optional<Device> device = remove.getFirst();
         if (device.isPresent()) {

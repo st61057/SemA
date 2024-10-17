@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 @Tag(name = "User", description = "Users")
@@ -76,7 +77,7 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
             }
     )
-    public ResponseEntity<?> removeSensorFromDevice(@RequestBody UserDeviceDto userDeviceDto) {
+    public ResponseEntity<?> removeSensorFromDevice(@Valid @RequestBody UserDeviceDto userDeviceDto) {
         Pair<Optional<User>, String> remove = userService.removeDeviceFromUser(userDeviceDto);
         Optional<User> user = remove.getFirst();
         if (user.isPresent()) {
@@ -96,7 +97,7 @@ public class UserController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing token")
             }
     )
-    public ResponseEntity<?> updateUser(@RequestBody UpdateUserDto userDto) {
+    public ResponseEntity<?> updateUser(@Valid @RequestBody UpdateUserDto userDto) {
         Pair<Optional<User>, String> update = userService.updateUser(userDto);
         Optional<User> user = update.getFirst();
         if (user.isPresent()) {
@@ -132,7 +133,7 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "Invalid old password or other error")
             }
     )
-    public ResponseEntity<?> changePasswordOnExistingUser(@RequestBody NewPasswordDto userDto) {
+    public ResponseEntity<?> changePasswordOnExistingUser(@Valid @RequestBody NewPasswordDto userDto) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
         boolean isCurrentPasswordMatching = userService.authenticated(user, userDto.getOldPassword());

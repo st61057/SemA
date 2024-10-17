@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.List;
 
 @AllArgsConstructor
@@ -20,5 +21,5 @@ public class UpdateDeviceDto {
     private String name;
 
     @Schema(description = "Sensors names, which are assigned to device", example = "my_sensor_1")
-    private List<String> sensorsNames;
+    private List<String> sensorsNames = new ArrayList<>();
 }

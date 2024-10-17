@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -75,7 +76,7 @@ public class AuthenticationController {
                     @ApiResponse(responseCode = "400", description = "User is already existing")
             }
     )
-    public ResponseEntity<?> register(@RequestBody RegisterDto registerDto) {
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterDto registerDto) {
         Pair<Optional<User>, String> creation = userService.createUser(registerDto);
         Optional<User> user = creation.getFirst();
         if (user.isPresent()) {
@@ -117,7 +118,7 @@ public class AuthenticationController {
                     @ApiResponse(responseCode = "400", description = "Invalid reset code or invalid password")
             }
     )
-    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ChangePasswordDto changePasswordDto) {
         Pair<Optional<User>, String> update = userService.updatePassword(changePasswordDto);
         Optional<User> updateUser = update.getFirst();
         if (updateUser.isPresent()) {

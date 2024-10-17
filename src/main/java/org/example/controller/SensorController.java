@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class SensorController {
                     @ApiResponse(responseCode = "404", description = "User or device not found")
             }
     )
-    public ResponseEntity<?> addSensor(@RequestBody SensorDto sensorDto) {
+    public ResponseEntity<?> addSensor(@Valid @RequestBody SensorDto sensorDto) {
         Pair<Optional<Sensor>, String> creation = sensorService.createSensor(sensorDto);
         Optional<Sensor> sensor = creation.getFirst();
         if (sensor.isPresent()) {
@@ -72,7 +73,7 @@ public class SensorController {
                     @ApiResponse(responseCode = "404", description = "User, device, or sensor not found")
             }
     )
-    public ResponseEntity<?> updateSensor(@RequestBody UpdateSensorDto sensorDto) {
+    public ResponseEntity<?> updateSensor(@Valid @RequestBody UpdateSensorDto sensorDto) {
         Pair<Optional<Sensor>, String> creation = sensorService.updateSensor(sensorDto);
         Optional<Sensor> sensor = creation.getFirst();
         if (sensor.isPresent()) {

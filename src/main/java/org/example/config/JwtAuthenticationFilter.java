@@ -18,6 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @AllArgsConstructor
 @Component
@@ -29,9 +31,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    private static final List<String> EXCLUDED_URLS = Arrays.asList("/v3/", "/swagger-ui/", "/public/");
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+
+        String requestURI = req.getRequestURI();
+        if (EXCLUDED_URLS.stream().anyMatch(url -> requestURI.contains(url))) {
+            chain.doFilter(req, res);
+            return;
+        }
+
         String header = req.getHeader("Authorization");
         String username = null;
         String authToken = null;
