@@ -4,9 +4,6 @@ import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
-import org.springframework.data.elasticsearch.annotations.Document;
-import org.springframework.data.elasticsearch.annotations.Field;
-import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,28 +18,34 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Document(indexName = "app_user")
+@Table(name = "app_user")
 public class User implements UserDetails {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-    @Field(type = FieldType.Keyword)
+    @Column(unique = true, nullable = false)
     private String username;
 
-    @Field(type = FieldType.Keyword)
+    @Column
     private String email;
 
-    @Field(type = FieldType.Text)
+    @Column
     private String password;
 
-    @Field(type = FieldType.Text, index = false)
+    @Column
     private String resetCode;
 
-    @Field(type = FieldType.Date)
+    @Column
     private Timestamp resetCodeTimestamp;
 
-    @Field(type = FieldType.Nested)
+    @ManyToMany
+    @JoinTable(
+            name = "user_device",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "device_id")
+    )
     @JsonIgnore
     private Set<Device> devices;
 
