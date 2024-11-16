@@ -20,7 +20,7 @@ public class DatabaseInitializer {
     public void init() {
 
         String dialect = env.getProperty("spring.jpa.properties.hibernate.dialect");
-        if (dialect.equals("org.hibernate.dialect.H2Dialect")) {
+        if (dialect != null && dialect.equals("org.hibernate.dialect.H2Dialect")) {
             jdbcTemplate.update("INSERT INTO APP_USER (USERNAME, EMAIL, PASSWORD, RESET_CODE) VALUES ('testuser1','nnpdasem@gmail.com','{bcrypt}$2a$10$sCGmi2tZ8K8wxK8z/e4FAOOYRBtzwxtni8Qnt7rg4mBCDKWAlOhHu','code1')");
             jdbcTemplate.update("INSERT INTO APP_USER (USERNAME, EMAIL, PASSWORD, RESET_CODE) VALUES ('testuser2','testovaci_email@email.cz','{bcrypt}$2a$10$sCGmi2tZ8K8wxK8z/e4FAOOYRBtzwxtni8Qnt7rg4mBCDKWAlOhHu','code1')");
             jdbcTemplate.update("INSERT INTO APP_USER (USERNAME, EMAIL, PASSWORD, RESET_CODE) VALUES ('testuser3','testovaci_email@email.cz','{bcrypt}$2a$10$sCGmi2tZ8K8wxK8z/e4FAOOYRBtzwxtni8Qnt7rg4mBCDKWAlOhHu','code1')");

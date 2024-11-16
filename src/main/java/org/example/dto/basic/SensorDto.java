@@ -9,6 +9,8 @@ import org.example.entity.SensorType;
 import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,10 +25,6 @@ public class SensorDto {
     @NotBlank(message = "Sensor type is required.")
     private SensorType sensorType;
 
-    @Schema(description = "Sensor temperature", example = "38")
-    private BigDecimal sensorTemperature;
-
-    @Schema(description = "Sensor usage energy", example = "O")
-    private BigDecimal sensorUsageEnergy;
+    private List<SensorDataDto> sensorDataDto = new ArrayList<>();
 
 }

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,11 +25,8 @@ public class Sensor {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @Column
-    private BigDecimal sensorTemperature;
-
-    @Column
-    private BigDecimal sensorUsageEnergy;
+    @OneToMany(mappedBy = "sensor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SensorData> measuredValues = new ArrayList<>();
 
     @Column
     private SensorType sensorType;
@@ -36,10 +35,8 @@ public class Sensor {
     @JoinColumn(name = "device_id")
     private Device device;
 
-    public Sensor(String name, BigDecimal sensorTemperature, BigDecimal sensorUsageEnergy, SensorType sensorType) {
+    public Sensor(String name, SensorType sensorType) {
         this.name = name;
-        this.sensorTemperature = sensorTemperature;
-        this.sensorUsageEnergy = sensorUsageEnergy;
         this.sensorType = sensorType;
     }
 }

@@ -32,7 +32,6 @@ public class UtilService {
             user.setResetCode(null);
             userService.updateUser(user);
         }
-
     }
 
 }
