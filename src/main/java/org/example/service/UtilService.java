@@ -21,6 +21,9 @@ public class UtilService {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private SensorDataService sensorDataService;
+
     @Scheduled(fixedRate = 3600000)
     @Transactional
     public void validateResetCodesValidity() {
@@ -31,6 +34,15 @@ public class UtilService {
         for (User user : expiredResetCodes) {
             user.setResetCode(null);
             userService.updateUser(user);
+        }
+    }
+
+    @Scheduled(fixedRate = 1000)
+    public void generateSensorData() {
+        try {
+            sensorDataService.generateSensorData();
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating sensor data: " + e.getMessage());
         }
     }
 
