@@ -22,12 +22,6 @@ public class DeviceDto {
     @Schema(description = "Location name", example = "Prague")
     private String location;
 
-    @Schema(description = "Latitude of device", example = "65.458946")
-    private Long lat;
-
-    @Schema(description = "Longitude of device", example = "5.458946")
-    private Long lon;
-
     private List<String> sensorsName = new ArrayList<>();
 
 }

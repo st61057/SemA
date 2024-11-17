@@ -42,7 +42,7 @@ public class DeviceService {
                     sensors.add(sensor.get());
                 }
             }
-            Device device = new Device(deviceDto.getName(), deviceDto.getLocation(), deviceDto.getLat(), deviceDto.getLon(), sensors);
+            Device device = new Device(deviceDto.getName(), deviceDto.getLocation(), sensors);
             sensors.forEach(sensor -> sensor.setDevice(device));
             return Pair.of(Optional.of(deviceRepository.save(device)), StringUtils.EMPTY);
         }
@@ -88,7 +88,7 @@ public class DeviceService {
         Device device = existingDevice.get();
         Sensor sensor = existingSensor.get();
 
-        if (device.getSensorList().isEmpty()) {
+        if (device.getSensorList().isEmpty() || !device.getSensorList().contains(sensor)) {
             return Pair.of(Optional.empty(), "Sensor isn't connected to this device");
         } else {
             device.getSensorList().remove(sensor);
@@ -119,6 +119,7 @@ public class DeviceService {
 
         Device updatedDevice = existingDevice.get();
         updatedDevice.setName(updateDeviceDto.getName());
+        updatedDevice.setLocation(updateDeviceDto.getLocation());
         updatedDevice.setSensorList(sensors);
         return Pair.of(Optional.of(deviceRepository.save(updatedDevice)), StringUtils.EMPTY);
 

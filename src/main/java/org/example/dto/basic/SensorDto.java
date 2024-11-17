@@ -20,10 +20,10 @@ public class SensorDto {
     @Schema(description = "Sensor name", example = "humidity sensor xyz")
     @NotBlank(message = "Name is required.")
     private String name;
-
-    @Schema(description = "Sensor type", example = "O")
-    @NotBlank(message = "Sensor type is required.")
-    private SensorType sensorType;
+//
+//    @Schema(description = "Sensor type", example = "O")
+//    @NotBlank(message = "Sensor type is required.")
+//    private SensorType sensorType;
 
     private List<SensorDataDto> sensorDataDto = new ArrayList<>();
 

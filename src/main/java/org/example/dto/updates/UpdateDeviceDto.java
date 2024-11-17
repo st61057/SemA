@@ -20,6 +20,9 @@ public class UpdateDeviceDto {
     @NotBlank(message = "Name is required.")
     private String name;
 
+    @Schema(description = "Location name", example = "Prague")
+    private String location;
+
     @Schema(description = "Sensors names, which are assigned to device", example = "my_sensor_1")
     private List<String> sensorsNames = new ArrayList<>();
 }

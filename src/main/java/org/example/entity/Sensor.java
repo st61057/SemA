@@ -28,15 +28,15 @@ public class Sensor {
     @OneToMany(mappedBy = "sensor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SensorData> measuredValues = new ArrayList<>();
 
-    @Column
-    private SensorType sensorType;
+//    @Column
+//    private SensorType sensorType;
 
     @ManyToOne
     @JoinColumn(name = "device_id")
     private Device device;
 
-    public Sensor(String name, SensorType sensorType) {
+    public Sensor(String name/*, SensorType sensorType*/) {
         this.name = name;
-        this.sensorType = sensorType;
+//        this.sensorType = sensorType;
     }
 }

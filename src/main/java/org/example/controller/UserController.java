@@ -58,7 +58,7 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
             }
     )
-    public ResponseEntity<?> addSensorToDevice(@RequestBody UserDeviceDto userDeviceDto) {
+    public ResponseEntity<?> addDeviceToUser(@RequestBody UserDeviceDto userDeviceDto) {
         Pair<Optional<User>, String> add = userService.addDeviceToUser(userDeviceDto);
         Optional<User> user = add.getFirst();
         if (user.isPresent()) {
@@ -77,7 +77,7 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "Bad request - Invalid input")
             }
     )
-    public ResponseEntity<?> removeSensorFromDevice(@Valid @RequestBody UserDeviceDto userDeviceDto) {
+    public ResponseEntity<?> removeDeviceFromUser(@Valid @RequestBody UserDeviceDto userDeviceDto) {
         Pair<Optional<User>, String> remove = userService.removeDeviceFromUser(userDeviceDto);
         Optional<User> user = remove.getFirst();
         if (user.isPresent()) {
