@@ -12,6 +12,7 @@ import org.example.dto.basic.DeviceSensorDto;
 import org.example.dto.updates.UpdateDeviceDto;
 import org.example.entity.Device;
 import org.example.entity.Sensor;
+import org.example.service.ConverterService;
 import org.example.service.DeviceService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.util.Pair;
@@ -31,7 +32,7 @@ public class DeviceController {
 
     private final DeviceService deviceService;
 
-    private final ModelMapper modelMapper;
+    private final ConverterService converterService;
 
     @GetMapping("/all-devices")
     @Operation(
@@ -43,7 +44,7 @@ public class DeviceController {
     )
     public ResponseEntity<?> getAllDevices() {
         List<Device> sensors = deviceService.findAllDevices();
-        return ResponseEntity.ok(sensors.stream().map(this::convertDeviceToDto).collect(Collectors.toList()));
+        return ResponseEntity.ok(sensors.stream().map(converterService::convertDeviceToDto).collect(Collectors.toList()));
     }
 
     @PostMapping(value = "/device-add")
@@ -59,7 +60,7 @@ public class DeviceController {
         Pair<Optional<Device>, String> creation = deviceService.createDevice(deviceDto);
         Optional<Device> sensor = creation.getFirst();
         if (sensor.isPresent()) {
-            return ResponseEntity.ok(convertDeviceToDto(sensor.get()));
+            return ResponseEntity.ok(converterService.convertDeviceToDto(sensor.get()));
         }
         return ResponseEntity.badRequest().body(creation.getSecond());
     }
@@ -77,7 +78,7 @@ public class DeviceController {
         Pair<Optional<Device>, String> add = deviceService.addSensorToDevice(deviceSensorDto);
         Optional<Device> device = add.getFirst();
         if (device.isPresent()) {
-            return ResponseEntity.ok(convertDeviceToDto(device.get()));
+            return ResponseEntity.ok(converterService.convertDeviceToDto(device.get()));
         }
         return ResponseEntity.badRequest().body(add.getSecond());
     }
@@ -96,7 +97,7 @@ public class DeviceController {
         Pair<Optional<Device>, String> remove = deviceService.removeSensorFromDevice(deviceSensorDto);
         Optional<Device> device = remove.getFirst();
         if (device.isPresent()) {
-            return ResponseEntity.ok(convertDeviceToDto(device.get()));
+            return ResponseEntity.ok(converterService.convertDeviceToDto(device.get()));
         }
         return ResponseEntity.badRequest().body(remove.getSecond());
     }
@@ -114,7 +115,7 @@ public class DeviceController {
         Pair<Optional<Device>, String> update = deviceService.updateDevice(deviceDto);
         Optional<Device> device = update.getFirst();
         if (device.isPresent()) {
-            return ResponseEntity.ok(convertDeviceToDto(device.get()));
+            return ResponseEntity.ok(converterService.convertDeviceToDto(device.get()));
         }
         return ResponseEntity.badRequest().body(update.getSecond());
     }
@@ -132,20 +133,8 @@ public class DeviceController {
         Pair<Optional<Device>, String> delete = deviceService.deleteDevice(name);
         Optional<Device> sensor = delete.getFirst();
         if (sensor.isPresent()) {
-            return ResponseEntity.ok(convertDeviceToDto(sensor.get()));
+            return ResponseEntity.ok(converterService.convertDeviceToDto(sensor.get()));
         }
         return ResponseEntity.badRequest().body(delete.getSecond());
-    }
-
-    private DeviceDto convertDeviceToDto(Device device) {
-        DeviceDto deviceDto = modelMapper.map(device, DeviceDto.class);
-        deviceDto.setName(device.getName());
-        deviceDto.setLocation(device.getLocation());
-
-        List<Sensor> sensors = device.getSensorList();
-        if (sensors != null) {
-            sensors.forEach(sensor -> deviceDto.getSensorsName().add(sensor.getName()));
-        }
-        return deviceDto;
     }
 }

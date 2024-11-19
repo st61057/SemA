@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.example.dto.basic.SensorDto;
 import org.example.dto.updates.UpdateSensorDto;
 import org.example.entity.Sensor;
+import org.example.service.ConverterService;
 import org.example.service.SensorService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.util.Pair;
@@ -30,6 +31,8 @@ public class SensorController {
 
     private final SensorService sensorService;
 
+    private final ConverterService converterService;
+
     @GetMapping("/all-sensors")
     @Operation(
             summary = "Retrieves all available sensors",
@@ -40,7 +43,7 @@ public class SensorController {
     )
     public ResponseEntity<?> getAllSensors() {
         List<Sensor> sensors = sensorService.findAllSensors();
-        return ResponseEntity.ok(sensors.stream().map(sensorService::convertSensorToDto).collect(Collectors.toList()));
+        return ResponseEntity.ok(sensors.stream().map(converterService::convertSensorToDto).collect(Collectors.toList()));
     }
 
     @PostMapping(value = "/sensor-add")
@@ -56,9 +59,9 @@ public class SensorController {
         Pair<Optional<Sensor>, String> creation = sensorService.createSensor(sensorDto);
         Optional<Sensor> sensor = creation.getFirst();
         if (sensor.isPresent()) {
-            return ResponseEntity.ok(sensorService.convertSensorToDto(sensor.get()));
+            return ResponseEntity.ok(converterService.convertSensorToDto(sensor.get()));
         }
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(creation.getSecond());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(creation.getSecond());
     }
 
     @PutMapping(value = "/sensor-update")
@@ -74,7 +77,7 @@ public class SensorController {
         Pair<Optional<Sensor>, String> creation = sensorService.updateSensor(sensorDto);
         Optional<Sensor> sensor = creation.getFirst();
         if (sensor.isPresent()) {
-            return ResponseEntity.ok(sensorService.convertSensorToDto(sensor.get()));
+            return ResponseEntity.ok(converterService.convertSensorToDto(sensor.get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(creation.getSecond());
     }
@@ -92,7 +95,7 @@ public class SensorController {
         Pair<Optional<Sensor>, String> creation = sensorService.deleteSensor(name);
         Optional<Sensor> sensor = creation.getFirst();
         if (sensor.isPresent()) {
-            return ResponseEntity.ok(sensorService.convertSensorToDto(sensor.get()));
+            return ResponseEntity.ok(converterService.convertSensorToDto(sensor.get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(creation.getSecond());
     }

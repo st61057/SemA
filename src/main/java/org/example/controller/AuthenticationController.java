@@ -13,6 +13,7 @@ import org.example.dto.updates.RegisterDto;
 import org.example.dto.basic.UserDto;
 import org.example.entity.AuthToken;
 import org.example.entity.User;
+import org.example.service.ConverterService;
 import org.example.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.simplejavamail.api.email.Email;
@@ -38,7 +39,7 @@ public class AuthenticationController {
 
     private final UserService userService;
 
-    private final ModelMapper modelMapper;
+    private final ConverterService converterService;
 
     private final JwtTokenUtil jwtTokenUtil;
 
@@ -85,7 +86,7 @@ public class AuthenticationController {
         Pair<Optional<User>, String> creation = userService.createUser(registerDto);
         Optional<User> user = creation.getFirst();
         if (user.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(convertUserToDto(user.get()));
+            return ResponseEntity.status(HttpStatus.CREATED).body(converterService.convertUserToDto(user.get()));
         }
 
         return ResponseEntity.badRequest().body(creation.getSecond());
@@ -107,7 +108,7 @@ public class AuthenticationController {
             existingUser.get().setResetCode(resetCode);
             User updatedUser = userService.updateUser(existingUser.get());
             sendEmail(updatedUser.getEmail(), resetCode);
-            return ResponseEntity.ok(convertUserToDto(updatedUser));
+            return ResponseEntity.ok(converterService.convertUserToDto(updatedUser));
 
         }
         return ResponseEntity.badRequest().body("User doesn't exist");
@@ -127,7 +128,7 @@ public class AuthenticationController {
         Pair<Optional<User>, String> update = userService.updatePassword(changePasswordDto);
         Optional<User> updateUser = update.getFirst();
         if (updateUser.isPresent()) {
-            return ResponseEntity.ok(convertUserToDto(updateUser.get()));
+            return ResponseEntity.ok(converterService.convertUserToDto(updateUser.get()));
         }
         return ResponseEntity.badRequest().body(update.getSecond());
     }
@@ -152,12 +153,4 @@ public class AuthenticationController {
         System.out.println("Email sent successfully!");
     }
     //"nnpdasem@gmail.com", "NnpdaTest1"
-
-    private UserDto convertUserToDto(User user) {
-        UserDto userDto = modelMapper.map(user, UserDto.class);
-        userDto.setUsername(user.getUsername());
-        userDto.setEmail(user.getEmail());
-        userDto.setDevices(user.getDevices());
-        return userDto;
-    }
 }

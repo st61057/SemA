@@ -7,6 +7,7 @@ import org.example.dto.basic.SensorDataDto;
 import org.example.dto.basic.SensorDto;
 import org.example.entity.Sensor;
 import org.example.entity.SensorData;
+import org.example.service.ConverterService;
 import org.example.service.SensorDataService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.util.Pair;
@@ -25,16 +26,18 @@ public class SensorDataController {
 
     private final SensorDataService sensorDataService;
 
+    private final ConverterService converterService;
+
     @GetMapping
     public ResponseEntity<List<SensorDataDto>> getAllSensorData() {
         List<SensorData> sensorsData = sensorDataService.findAllSensorsData();
-        return ResponseEntity.ok(sensorsData.stream().map(sensorDataService::convertSensorDataToDto).collect(Collectors.toList()));
+        return ResponseEntity.ok(sensorsData.stream().map(converterService::convertSensorDataToDto).collect(Collectors.toList()));
     }
 
     @GetMapping("/{name}")
     public ResponseEntity<?> getSensorDataBySensorName(@PathVariable String name) {
         List<SensorData> sensors = sensorDataService.findSensorDataByName(name);
-        return ResponseEntity.ok(sensors.stream().map(sensorDataService::convertSensorDataToDto).collect(Collectors.toList()));
+        return ResponseEntity.ok(sensors.stream().map(converterService::convertSensorDataToDto).collect(Collectors.toList()));
     }
 
     @PostMapping
@@ -42,7 +45,7 @@ public class SensorDataController {
         Pair<Optional<SensorData>, String> add = sensorDataService.addSensorDataToSensor(sensorDataDto);
         Optional<SensorData> sensorData = add.getFirst();
         if (sensorData.isPresent()) {
-            return ResponseEntity.ok(sensorDataService.convertSensorDataToDto(sensorData.get()));
+            return ResponseEntity.ok(converterService.convertSensorDataToDto(sensorData.get()));
         }
         return ResponseEntity.badRequest().body(add.getSecond());
     }

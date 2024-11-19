@@ -23,9 +23,6 @@ public class SensorService {
     private SensorRepository sensorRepository;
 
     @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
     private DeviceService deviceService;
 
     @Autowired
@@ -73,12 +70,4 @@ public class SensorService {
     public Optional<Sensor> findSensorByName(String name) {
         return sensorRepository.findByName(name);
     }
-
-    public SensorDto convertSensorToDto(Sensor sensor) {
-        SensorDto sensorDto = modelMapper.map(sensor, SensorDto.class);
-        sensorDto.setName(sensorDto.getName());
-        sensorDto.setSensorDataDto(sensor.getMeasuredValues().stream().map(sensorDataService::convertSensorDataToDto).collect(Collectors.toList()));
-        return sensorDto;
-    }
-
 }

@@ -11,6 +11,7 @@ import org.example.dto.updates.NewPasswordDto;
 import org.example.dto.updates.UpdateUserDto;
 import org.example.dto.basic.UserDto;
 import org.example.entity.User;
+import org.example.service.ConverterService;
 import org.example.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.util.Pair;
@@ -32,7 +33,7 @@ public class UserController {
 
     private final UserService userService;
 
-    private final ModelMapper modelMapper;
+    private final ConverterService converterService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -43,7 +44,7 @@ public class UserController {
         String username = user.getUsername();
         Optional<User> existingUser = userService.findUserByUsername(username);
         if (existingUser.isPresent()) {
-            return ResponseEntity.ok(convertUserToDto(existingUser.get()));
+            return ResponseEntity.ok(converterService.convertUserToDto(existingUser.get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
     }
@@ -62,7 +63,7 @@ public class UserController {
         Pair<Optional<User>, String> add = userService.addDeviceToUser(userDeviceDto);
         Optional<User> user = add.getFirst();
         if (user.isPresent()) {
-            return ResponseEntity.ok(convertUserToDto(user.get()));
+            return ResponseEntity.ok(converterService.convertUserToDto(user.get()));
         }
         return ResponseEntity.badRequest().body(add.getSecond());
     }
@@ -81,7 +82,7 @@ public class UserController {
         Pair<Optional<User>, String> remove = userService.removeDeviceFromUser(userDeviceDto);
         Optional<User> user = remove.getFirst();
         if (user.isPresent()) {
-            return ResponseEntity.ok(convertUserToDto(user.get()));
+            return ResponseEntity.ok(converterService.convertUserToDto(user.get()));
         }
         return ResponseEntity.badRequest().body(remove.getSecond());
     }
@@ -101,7 +102,7 @@ public class UserController {
         Pair<Optional<User>, String> update = userService.updateUser(userDto);
         Optional<User> user = update.getFirst();
         if (user.isPresent()) {
-            return ResponseEntity.ok(convertUserToDto(user.get()));
+            return ResponseEntity.ok(converterService.convertUserToDto(user.get()));
         }
         return ResponseEntity.badRequest().body(update.getSecond());
     }
@@ -119,7 +120,7 @@ public class UserController {
         Pair<Optional<User>, String> delete = userService.deleteUser(name);
         Optional<User> user = delete.getFirst();
         if (user.isPresent()) {
-            return ResponseEntity.ok(convertUserToDto(user.get()));
+            return ResponseEntity.ok(converterService.convertUserToDto(user.get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(delete.getSecond());
     }
@@ -141,18 +142,9 @@ public class UserController {
 
         if (isCurrentPasswordMatching && isNewPasswordDifferent) {
             user.setPassword(passwordEncoder.encode(userDto.getNewPassword()));
-            return ResponseEntity.ok(convertUserToDto(userService.updateUser(user)));
+            return ResponseEntity.ok(converterService.convertUserToDto(userService.updateUser(user)));
         }
 
         return ResponseEntity.badRequest().body("Problem with password doesn't match or new is similar as current");
     }
-
-    private UserDto convertUserToDto(User user) {
-        UserDto userDto = modelMapper.map(user, UserDto.class);
-        userDto.setUsername(user.getUsername());
-        userDto.setEmail(user.getEmail());
-        userDto.setDevices(user.getDevices());
-        return userDto;
-    }
-
 }
