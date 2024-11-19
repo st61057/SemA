@@ -32,4 +32,11 @@ public class SensorData {
 
     @ManyToOne
     private Sensor sensor;
+
+    public SensorData(Instant dataMeasuredTime, BigDecimal temperature, BigDecimal usageEnergy, Sensor sensor) {
+        this.dataMeasuredTime = dataMeasuredTime;
+        this.temperature = temperature;
+        this.usageEnergy = usageEnergy;
+        this.sensor = sensor;
+    }
 }

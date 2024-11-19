@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -95,31 +96,16 @@ public class UserService implements UserDetailsService {
 
     public Pair<Optional<User>, String> updateUser(UpdateUserDto updateUserDto) {
 
-        Optional<User> existingUser = findUserByUsername(updateUserDto.getUsername());
+        Optional<User> existingUser = findUserByUsername(updateUserDto.getLoggedUsername());
 
         if (existingUser.isEmpty()) {
             return Pair.of(Optional.empty(), "User with this name doesn't exists");
         }
 
         User updatedUser = existingUser.get();
-        Set<Device> listOfDevices = new HashSet<>();
-
-        if (!updateUserDto.getDevicesNames().isEmpty()) {
-            for (String deviceName : updateUserDto.getDevicesNames()) {
-                Optional<Device> existingDevice = deviceService.findDeviceByName(deviceName);
-                if (existingDevice.isEmpty()) {
-                    return Pair.of(Optional.empty(), "Device with name " + deviceName + " doesn't exists");
-                }
-
-                Device device = existingDevice.get();
-                device.getUser().add(updatedUser);
-                listOfDevices.add(existingDevice.get());
-            }
-        }
 
         updatedUser.setUsername(updateUserDto.getUsername());
         updatedUser.setEmail(updateUserDto.getEmail());
-        updatedUser.setDevices(listOfDevices);
 
         return Pair.of(Optional.of(userRepository.save(updatedUser)), StringUtils.EMPTY);
 

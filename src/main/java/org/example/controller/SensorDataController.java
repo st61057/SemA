@@ -9,11 +9,13 @@ import org.example.entity.Sensor;
 import org.example.entity.SensorData;
 import org.example.service.SensorDataService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -21,38 +23,30 @@ import java.util.stream.Collectors;
 @RequestMapping(path = "/api")
 public class SensorDataController {
 
-    private final SensorDataRepository sensorDataRepository;
+    private final SensorDataService sensorDataService;
     private final SensorRepository sensorRepository;
     private final ModelMapper modelMapper;
 
     @GetMapping
-    public ResponseEntity<List<SensorData>> getAllSensorData() {
-        List<SensorData> data = sensorDataRepository.findAll();
-        return ResponseEntity.ok(data);
+    public ResponseEntity<List<SensorDataDto>> getAllSensorData() {
+        List<SensorData> sensorsData = sensorDataService.findAllSensorsData();
+        return ResponseEntity.ok(sensorsData.stream().map(this::convertSensorDataToDto).collect(Collectors.toList()));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{name}")
     public ResponseEntity<?> getSensorDataBySensorName(@PathVariable String name) {
-        List<SensorData> sensors = sensorDataRepository.findBySensorName(name);
+        List<SensorData> sensors = sensorDataService.findSensorDataByName(name);
         return ResponseEntity.ok(sensors.stream().map(this::convertSensorDataToDto).collect(Collectors.toList()));
     }
 
     @PostMapping
-    public ResponseEntity<?> addSensorData(@RequestBody SensorData sensorData) {
-        try {
-            if (sensorData.getSensor() != null) {
-                var sensor = sensorRepository.findById(sensorData.getSensor().getId());
-                if (sensor.isEmpty()) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Sensor with ID " + sensorData.getSensor().getId() + " not found.");
-                }
-                sensorData.setSensor(sensor.get());
-            }
-
-            SensorData savedData = sensorDataRepository.save(sensorData);
-            return ResponseEntity.ok(savedData);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error adding sensor data: " + e.getMessage());
+    public ResponseEntity<?> addSensorData(@RequestBody SensorDataDto sensorDataDto) {
+        Pair<Optional<SensorData>, String> add = sensorDataService.addSensorDataToSensor(sensorDataDto);
+        Optional<SensorData> sensorData = add.getFirst();
+        if (sensorData.isPresent()) {
+            return ResponseEntity.ok(convertSensorDataToDto(sensorData.get()));
         }
+        return ResponseEntity.badRequest().body(add.getSecond());
     }
 
     private SensorDataDto convertSensorDataToDto(SensorData sensorData) {

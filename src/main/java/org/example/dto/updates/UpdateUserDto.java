@@ -15,6 +15,10 @@ import java.util.List;
 @Data
 public class UpdateUserDto {
 
+    @Schema(description = "Logged username", example = "test")
+    @NotBlank(message = "Name is required")
+    private String loggedUsername;
+
     @Schema(description = "Users name", example = "testuser1")
     @NotBlank(message = "Name is required.")
     private String username;
@@ -23,9 +27,5 @@ public class UpdateUserDto {
     @NotBlank(message = "Name is required.")
     @Email(message = "Email must be valid")
     private String email;
-
-    @Schema(description = "Users assigned devices", example = "my_device_1")
-    private List<String> devicesNames = new ArrayList<>();
-
 
 }

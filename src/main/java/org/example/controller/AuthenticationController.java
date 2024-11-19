@@ -23,6 +23,7 @@ import org.simplejavamail.mailer.MailerBuilder;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -64,7 +65,11 @@ public class AuthenticationController {
             return ResponseEntity.ok(new AuthToken(token));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+    }
 
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public ResponseEntity<?> logout() throws AuthenticationException {
+        return ResponseEntity.ok("Successfully log out");
     }
 
     @PostMapping(value = "/register")
