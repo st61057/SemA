@@ -23,7 +23,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Tag(name = "User", description = "Users")
 @AllArgsConstructor
@@ -37,7 +39,7 @@ public class UserController {
 
     private final PasswordEncoder passwordEncoder;
 
-    @GetMapping("/user-info")
+    @GetMapping(value = "/user-info")
     public ResponseEntity<?> getUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = (User) authentication.getPrincipal();
@@ -47,6 +49,12 @@ public class UserController {
             return ResponseEntity.ok(converterService.convertUserToDto(existingUser.get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not exists");
+    }
+
+    @GetMapping(value = "/all-users")
+    public ResponseEntity<?> getAllUsers() {
+        List<User> users = userService.findAllUsers();
+        return ResponseEntity.ok(users.stream().map(converterService::convertUserToDto).collect(Collectors.toList()));
     }
 
 

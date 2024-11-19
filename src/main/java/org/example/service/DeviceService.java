@@ -158,6 +158,6 @@ public class DeviceService {
     }
 
     public List<Device> findAllDevices() {
-        return (List<Device>) deviceRepository.findAll();
+        return deviceRepository.findAll();
     }
 }

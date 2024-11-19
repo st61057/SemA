@@ -130,6 +130,10 @@ public class UserService implements UserDetailsService {
         return Pair.of(Optional.of(user), StringUtils.EMPTY);
     }
 
+    public List<User> findAllUsers() {
+        return userRepository.findAll();
+    }
+
     public Optional<User> findUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
