@@ -7,12 +7,14 @@ import org.example.dto.basic.SensorDto;
 import org.example.dto.updates.UpdateSensorDto;
 import org.example.entity.Device;
 import org.example.entity.Sensor;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class SensorService {
@@ -21,7 +23,13 @@ public class SensorService {
     private SensorRepository sensorRepository;
 
     @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
     private DeviceService deviceService;
+
+    @Autowired
+    private SensorDataService sensorDataService;
 
     public List<Sensor> findAllSensors() {
         return sensorRepository.findAll();
@@ -64,6 +72,13 @@ public class SensorService {
 
     public Optional<Sensor> findSensorByName(String name) {
         return sensorRepository.findByName(name);
+    }
+
+    public SensorDto convertSensorToDto(Sensor sensor) {
+        SensorDto sensorDto = modelMapper.map(sensor, SensorDto.class);
+        sensorDto.setName(sensorDto.getName());
+        sensorDto.setSensorDataDto(sensor.getMeasuredValues().stream().map(sensorDataService::convertSensorDataToDto).collect(Collectors.toList()));
+        return sensorDto;
     }
 
 }

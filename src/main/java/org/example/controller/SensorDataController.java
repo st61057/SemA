@@ -24,19 +24,17 @@ import java.util.stream.Collectors;
 public class SensorDataController {
 
     private final SensorDataService sensorDataService;
-    private final SensorRepository sensorRepository;
-    private final ModelMapper modelMapper;
 
     @GetMapping
     public ResponseEntity<List<SensorDataDto>> getAllSensorData() {
         List<SensorData> sensorsData = sensorDataService.findAllSensorsData();
-        return ResponseEntity.ok(sensorsData.stream().map(this::convertSensorDataToDto).collect(Collectors.toList()));
+        return ResponseEntity.ok(sensorsData.stream().map(sensorDataService::convertSensorDataToDto).collect(Collectors.toList()));
     }
 
     @GetMapping("/{name}")
     public ResponseEntity<?> getSensorDataBySensorName(@PathVariable String name) {
         List<SensorData> sensors = sensorDataService.findSensorDataByName(name);
-        return ResponseEntity.ok(sensors.stream().map(this::convertSensorDataToDto).collect(Collectors.toList()));
+        return ResponseEntity.ok(sensors.stream().map(sensorDataService::convertSensorDataToDto).collect(Collectors.toList()));
     }
 
     @PostMapping
@@ -44,23 +42,9 @@ public class SensorDataController {
         Pair<Optional<SensorData>, String> add = sensorDataService.addSensorDataToSensor(sensorDataDto);
         Optional<SensorData> sensorData = add.getFirst();
         if (sensorData.isPresent()) {
-            return ResponseEntity.ok(convertSensorDataToDto(sensorData.get()));
+            return ResponseEntity.ok(sensorDataService.convertSensorDataToDto(sensorData.get()));
         }
         return ResponseEntity.badRequest().body(add.getSecond());
-    }
-
-    private SensorDataDto convertSensorDataToDto(SensorData sensorData) {
-        SensorDataDto sensorDataDto = modelMapper.map(sensorData, SensorDataDto.class);
-        sensorDataDto.setSensor(convertSensorToDto(sensorData.getSensor()));
-        sensorDataDto.setTemperature(sensorData.getTemperature());
-        sensorDataDto.setUsageEnergy(sensorData.getUsageEnergy());
-        return sensorDataDto;
-    }
-
-    public SensorDto convertSensorToDto(Sensor sensor) {
-        SensorDto sensorDto = modelMapper.map(sensor, SensorDto.class);
-        sensorDto.setName(sensorDto.getName());
-        return sensorDto;
     }
 }
 

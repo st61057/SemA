@@ -30,9 +30,6 @@ public class SensorController {
 
     private final SensorService sensorService;
 
-    private final ModelMapper modelMapper;
-
-
     @GetMapping("/all-sensors")
     @Operation(
             summary = "Retrieves all available sensors",
@@ -43,7 +40,7 @@ public class SensorController {
     )
     public ResponseEntity<?> getAllSensors() {
         List<Sensor> sensors = sensorService.findAllSensors();
-        return ResponseEntity.ok(sensors.stream().map(this::convertSensorToDto).collect(Collectors.toList()));
+        return ResponseEntity.ok(sensors.stream().map(sensorService::convertSensorToDto).collect(Collectors.toList()));
     }
 
     @PostMapping(value = "/sensor-add")
@@ -59,9 +56,9 @@ public class SensorController {
         Pair<Optional<Sensor>, String> creation = sensorService.createSensor(sensorDto);
         Optional<Sensor> sensor = creation.getFirst();
         if (sensor.isPresent()) {
-            return ResponseEntity.ok(convertSensorToDto(sensor.get()));
+            return ResponseEntity.ok(sensorService.convertSensorToDto(sensor.get()));
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(creation.getSecond());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(creation.getSecond());
     }
 
     @PutMapping(value = "/sensor-update")
@@ -77,7 +74,7 @@ public class SensorController {
         Pair<Optional<Sensor>, String> creation = sensorService.updateSensor(sensorDto);
         Optional<Sensor> sensor = creation.getFirst();
         if (sensor.isPresent()) {
-            return ResponseEntity.ok(convertSensorToDto(sensor.get()));
+            return ResponseEntity.ok(sensorService.convertSensorToDto(sensor.get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(creation.getSecond());
     }
@@ -95,15 +92,9 @@ public class SensorController {
         Pair<Optional<Sensor>, String> creation = sensorService.deleteSensor(name);
         Optional<Sensor> sensor = creation.getFirst();
         if (sensor.isPresent()) {
-            return ResponseEntity.ok(convertSensorToDto(sensor.get()));
+            return ResponseEntity.ok(sensorService.convertSensorToDto(sensor.get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(creation.getSecond());
-    }
-
-    private SensorDto convertSensorToDto(Sensor sensor) {
-        SensorDto sensorDto = modelMapper.map(sensor, SensorDto.class);
-        sensorDto.setName(sensorDto.getName());
-        return sensorDto;
     }
 
 }

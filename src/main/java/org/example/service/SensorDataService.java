@@ -8,6 +8,7 @@ import org.example.dto.basic.SensorDto;
 import org.example.entity.Device;
 import org.example.entity.Sensor;
 import org.example.entity.SensorData;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,11 @@ public class SensorDataService {
     private SensorDataRepository sensorDataRepository;
 
     @Autowired
+    private ModelMapper modelMapper;
+
+    @Autowired
     private SensorService sensorService;
+
     private final Random random = new Random();
 
     public List<SensorData> findAllSensorsData() {
@@ -80,5 +85,19 @@ public class SensorDataService {
             return null;
         }
         return sensors.get(random.nextInt(sensors.size()));
+    }
+
+    public SensorDataDto convertSensorDataToDto(SensorData sensorData) {
+        SensorDataDto sensorDataDto = modelMapper.map(sensorData, SensorDataDto.class);
+        sensorDataDto.setSensor(convertSensorToDto(sensorData.getSensor()));
+        sensorDataDto.setTemperature(sensorData.getTemperature());
+        sensorDataDto.setUsageEnergy(sensorData.getUsageEnergy());
+        return sensorDataDto;
+    }
+
+    public SensorDto convertSensorToDto(Sensor sensor) {
+        SensorDto sensorDto = modelMapper.map(sensor, SensorDto.class);
+        sensorDto.setName(sensorDto.getName());
+        return sensorDto;
     }
 }
