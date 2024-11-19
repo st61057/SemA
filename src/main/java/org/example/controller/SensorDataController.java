@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.example.dao.SensorDataRepository;
 import org.example.dao.SensorRepository;
 import org.example.dto.basic.SensorDataDto;
+import org.example.dto.basic.SensorDataReadDto;
 import org.example.dto.basic.SensorDto;
 import org.example.entity.Sensor;
 import org.example.entity.SensorData;
@@ -29,7 +30,7 @@ public class SensorDataController {
     private final ConverterService converterService;
 
     @GetMapping
-    public ResponseEntity<List<SensorDataDto>> getAllSensorData() {
+    public ResponseEntity<List<SensorDataReadDto>> getAllSensorData() {
         List<SensorData> sensorsData = sensorDataService.findAllSensorsData();
         return ResponseEntity.ok(sensorsData.stream().map(converterService::convertSensorDataToDto).collect(Collectors.toList()));
     }

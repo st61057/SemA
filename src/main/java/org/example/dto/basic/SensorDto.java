@@ -21,6 +21,6 @@ public class SensorDto {
     @NotBlank(message = "Name is required.")
     private String name;
 
-    private List<SensorDataDto> sensorDataDto = new ArrayList<>();
+    private List<SensorDataReadDto> sensorDataDto = new ArrayList<>();
 
 }

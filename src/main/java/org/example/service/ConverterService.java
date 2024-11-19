@@ -1,9 +1,6 @@
 package org.example.service;
 
-import org.example.dto.basic.DeviceDto;
-import org.example.dto.basic.SensorDataDto;
-import org.example.dto.basic.SensorDto;
-import org.example.dto.basic.UserDto;
+import org.example.dto.basic.*;
 import org.example.entity.Device;
 import org.example.entity.Sensor;
 import org.example.entity.SensorData;
@@ -49,11 +46,11 @@ public class ConverterService {
         return sensorDto;
     }
 
-    public SensorDataDto convertSensorDataToDto(SensorData sensorData) {
-        SensorDataDto sensorDataDto = modelMapper.map(sensorData, SensorDataDto.class);
-        sensorDataDto.setSensor(convertSensorToDto(sensorData.getSensor()));
+    public SensorDataReadDto convertSensorDataToDto(SensorData sensorData) {
+        SensorDataReadDto sensorDataDto = modelMapper.map(sensorData, SensorDataReadDto.class);
         sensorDataDto.setTemperature(sensorData.getTemperature());
         sensorDataDto.setUsageEnergy(sensorData.getUsageEnergy());
+        sensorDataDto.setDataMeasuredTime(sensorData.getDataMeasuredTime());
         return sensorDataDto;
     }
 }
