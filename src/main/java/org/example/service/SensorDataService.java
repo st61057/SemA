@@ -65,7 +65,7 @@ public class SensorDataService {
 
         SensorData sensorData = new SensorData();
         sensorData.setDataMeasuredTime(Instant.now());
-        sensorData.setTemperature(generateRandomBigDecimal(20, 30));
+        sensorData.setTemperature(generateRandomBigDecimal(15, 35));
         sensorData.setUsageEnergy(generateRandomBigDecimal(0, 100));
         sensorData.setSensor(sensor);
 

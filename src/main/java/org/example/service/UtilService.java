@@ -37,13 +37,13 @@ public class UtilService {
         }
     }
 
-//    @Scheduled(fixedRate = 10000)
-//    public void generateSensorData() {
-//        try {
-//            sensorDataService.generateSensorData();
-//        } catch (Exception e) {
-//            throw new RuntimeException("Error generating sensor data: " + e.getMessage());
-//        }
-//    }
+    @Scheduled(fixedRate = 10000)
+    public void generateSensorData() {
+        try {
+            sensorDataService.generateSensorData();
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating sensor data: " + e.getMessage());
+        }
+    }
 
 }
